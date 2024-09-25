@@ -38,7 +38,7 @@ sudo ./upgrade.sh
 ## Features
 
 This plugin provides the following features:
--   Add a new "**Voice**" tab in */dcim/sites/your_site_id
+-   Add a new "**Voice**" tab in */dcim/sites/your_site_id*
 -   Add a new item "**Voice**" in the navigation menu bar
 -   A fast voice-number quicksearch for every in-range numbers.
 
