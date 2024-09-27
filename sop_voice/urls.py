@@ -24,6 +24,7 @@ urlpatterns = [
     path('voicemaintainer/<int:pk>', vm.VoiceMaintainerDetailView.as_view(), name='voicemaintainer_detail'),
     path('voicemaintainer/add', vm.VoiceMaintainerEditView.as_view(), name='voicemaintainer_add'),
     path('voicemaintainer/edit', vm.VoiceMaintainerBulkEditView.as_view(), name='voicemaintainer_bulk_edit'),
+    path('voicemaintainer/import', vm.VoiceMaintainerBulkImportView.as_view(), name='voicemaintainer_import'),
     path('voicemaintainer/delete/', vm.VoiceMaintainerBulkDeleteView.as_view(), name='voicemaintainer_bulk_delete'),
     path('voicemaintainer/edit/<int:pk>', vm.VoiceMaintainerEditView.as_view(), name='voicemaintainer_edit'),
     path('voicemaintainer/delete/<int:pk>', vm.VoiceMaintainerDeleteView.as_view(), name='voicemaintainer_delete'),

@@ -15,6 +15,7 @@ __all__ = (
     'VoiceMaintainerDeleteView',
     'VoiceMaintainerBulkDeleteView',
     'VoiceMaintainerBulkEditView',
+    'VoiceMaintainerBulkImportView',
 )
 
 
@@ -105,3 +106,20 @@ class VoiceMaintainerBulkEditView(generic.BulkEditView):
     table = VoiceMaintainerTable
     form = VoiceMaintainerBulkEditForm
     filterset = VoiceMaintainerFilterSet
+
+
+class VoiceMaintainerBulkImportView(generic.BulkImportView):
+    queryset = VoiceMaintainer.objects.all()
+    model_form = VoiceMaintainerBulkImportForm
+
+    def save_object(self, object_form, request):
+        instance = object_form.save()
+        return instance
+
+    def post(self, request):
+        '''
+        post request handler
+        if additionnal changes is needed
+        '''
+        response = super().post(request)
+        return response

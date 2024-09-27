@@ -17,6 +17,7 @@ __all__ = (
 )
 
 
+
 #_________________________
 # Voice Delivery Filters
 
@@ -250,5 +251,8 @@ class VoiceSdaFilterSet(NetBoxModelFilterSet):
             return queryset
         return queryset.filter(
             Q(start__icontains=value) |
-            Q(end__icontains=value)
+            Q(end__icontains=value) |
+            Q(site__name__icontains=value) |
+            Q(delivery__delivery__icontains=value) |
+            Q(delivery__provider__name__icontains=value)
         )

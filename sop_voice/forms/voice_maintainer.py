@@ -1,9 +1,8 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from utilities.forms.fields import CommentField, SlugField
-
-from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm, NetBoxModelBulkEditForm
+from utilities.forms.fields import CommentField, SlugField, CSVChoiceField
+from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm, NetBoxModelBulkEditForm, NetBoxModelImportForm
 
 from ..models import *
 
@@ -12,6 +11,7 @@ __all__ = (
     'VoiceMaintainerForm',
     'VoiceMaintainerFilterForm',
     'VoiceMaintainerBulkEditForm',
+    'VoiceMaintainerBulkImportForm',
 )
 
 
@@ -62,3 +62,18 @@ class VoiceMaintainerForm(NetBoxModelForm):
 
         if 'tags' in self.fields:
             del self.fields['tags']
+
+
+class VoiceMaintainerBulkImportForm(NetBoxModelImportForm):
+    status = CSVChoiceField(
+        choices=VoiceMaintainerStatusChoice,
+        required=True,
+    )
+    slug = SlugField(required=True)
+
+    class Meta:
+        model = VoiceMaintainer
+        fields = ['name', 'slug', 'status', 'description',]
+
+    def clean(self):
+        super().clean()

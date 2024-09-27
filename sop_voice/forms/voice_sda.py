@@ -64,7 +64,7 @@ class VoiceSdaFilterForm(NetBoxModelFilterSetForm):
     start = forms.IntegerField(
         label=_('Start number'),
         required=False,
-        help_text=_('E164 format')
+        help_text=_('E164 format'),
     )
     end = forms.IntegerField(
         label=_('End number'),
@@ -119,7 +119,7 @@ class VoiceSdaForm(NetBoxModelForm):
 class VoiceSdaBulkImportForm(NetBoxModelImportForm):
     delivery = CSVModelChoiceField(
         queryset=VoiceDelivery.objects.all(),
-        to_field_name='slug',
+        to_field_name='id',
         required=False,
     )
     site = CSVModelChoiceField(

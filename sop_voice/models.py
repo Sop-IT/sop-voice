@@ -120,12 +120,6 @@ class SiteVoiceInfo(NetBoxModel):
 
 
 class VoiceDelivery(NetBoxModel):
-    slug = models.SlugField(
-        verbose_name=_('slug'),
-        max_length=100,
-        unique=True,
-        blank=True,
-    )
     delivery = models.CharField(
         verbose_name=_('Delivery'),
     )

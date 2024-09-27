@@ -23,6 +23,12 @@ VOICE = Menu(
                             icon_class='mdi mdi-plus-thick',
                             permissions=[f'sop_voice.add_voicemaintainer'],
                         ),
+                        MenuItemButton(
+                            link=f'plugins:sop_voice:voicemaintainer_import',
+                            title='Import',
+                            icon_class='mdi mdi-upload',
+                            permissions=[f'sop_voice.add_voicemaintainer'],
+                        ),
                     ),
                 ),
             ),

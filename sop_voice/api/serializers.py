@@ -29,7 +29,7 @@ class SiteBriefSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Site
-        fields = ('id', 'url', 'slug', 'name', 'description', 'slug')
+        fields = ('id', 'url', 'slug', 'name', 'description')
 
 
 #_______________________________
@@ -128,10 +128,10 @@ class VoiceDeliverySerializer(NetBoxModelSerializer):
 
     class Meta:
         model = VoiceDelivery
-        fields = ('id', 'url', 'slug', 'display', 'site', 'delivery', 'provider',
+        fields = ('id', 'url', 'display', 'site', 'delivery', 'provider',
             'channel_count', 'status',
         )
-        brief_fields = ('id', 'url', 'slug', 'display', 'provider', 'delivery',)
+        brief_fields = ('id', 'url', 'display', 'provider', 'delivery',)
 
     def get_provider(self, obj):
         if not obj.provider:

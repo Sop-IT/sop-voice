@@ -95,8 +95,6 @@ class VoiceDeliveryForm(NetBoxModelForm):
         queryset=Provider.objects.all(),
         label=_('Provider')
     )
-    # TODO: SlugField multi slug_source (site, delivery, provider)
-    slug = SlugField(required=True, slug_source='delivery')
     channel_count = forms.IntegerField(
         required=False,
         label=_('Channel Count'),
@@ -121,7 +119,7 @@ class VoiceDeliveryForm(NetBoxModelForm):
 
     class Meta:
         model = VoiceDelivery
-        fields = ('site', 'delivery', 'provider', 'slug', 'channel_count', 'status', 'ndi', 'dto', 'description', 'comments')
+        fields = ('site', 'delivery', 'provider', 'channel_count', 'status', 'ndi', 'dto', 'description', 'comments')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

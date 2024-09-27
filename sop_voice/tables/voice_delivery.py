@@ -42,6 +42,6 @@ class VoiceDeliveryTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = VoiceDelivery
-        fields = ('pk', 'id', 'actions', 'slug', 'delivery', 'provider', 'site',
+        fields = ('pk', 'id', 'actions', 'delivery', 'provider', 'site',
             'channel_count', 'status', 'ndi', 'dto', 'description', 'comments')
         default_columns = ('actions', 'delivery', 'provider', 'status', 'channel_count')

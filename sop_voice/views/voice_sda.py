@@ -64,7 +64,7 @@ class VoiceSdaDeleteView(generic.ObjectDeleteView):
     deletes a SDA List instance
     '''
     queryset = VoiceSda.objects.all()
-    
+
 
 class VoiceSdaDetailView(generic.ObjectView, PermissionRequiredMixin):
     '''
