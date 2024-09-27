@@ -245,37 +245,3 @@ class VoiceSda(NetBoxModel):
         ordering = ('start',)
         verbose_name = _('DID Range')
         verbose_name_plural = _('DIDs')
-
-    @staticmethod
-    def sop_json_to_bigint(json_import):
-        '''
-        Args:
-            json_import (list): List of strings in the format "start_number >> end_number"
-
-        Returns:
-            list: List of integer dicts with keys "start" and "end"
-        '''
-        converted_data = []
-
-        def format(number:str) -> str:
-            return ''.join(n for n in number if n.isdigit())
-
-        for data in json_import:
-            try:
-                start, end = data.split('>>')
-            except ValueError as e:
-                sys.stderr.write(f'Error: {e}\nCould not parse {data}: missing ">>".\n\
-    If end number is missing, use >> with an empty string.\n')
-                return None
-            try:
-                start = int(format(start))
-                if end is None or end.strip() == '':
-                    end = start
-                else:
-                    end = int(format(end))
-            except ValueError as e:
-                sys.stderr.write(f'Error: {e}\nCould not parse {data}: Cannot convert to integer.\n')
-                return None
-            converted_data.append({'start': start, 'end': end})
-
-        return converted_data

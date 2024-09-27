@@ -33,34 +33,19 @@
     </div>
     <div class="col-md-12">
         {% include 'sop_voice/tools/table.html' with object=context.delivery reversed_url='plugins:sop_voice:voicedelivery_add' pk=object.id %}
-        {% include 'sop_voice/tools/table.html' with object=context.sda reversed_url='plugins:sop_voice:voicesda_add' pk=object.id search=1%}
+        {% include 'sop_voice/tools/table.html' with object=context.sda reversed_url='plugins:sop_voice:voicesda_add' pk=object.id %}
     </div>
 </div>
 
 <!--
     ____________________________________________________
-    load my scripts for quicksearch, tableconfig and tab
+    load my scripts for tab
 -->
-<script src="{% static 'number_quicksearch.js' %}"></script>
 <script>
-/*
- * just to normalize the string
- */
-function lower_case(str)
-{
-    return str.toLowerCase();
-}
- 
 document.addEventListener('DOMContentLoaded', function ()
 {
     const all_tabs = document.querySelectorAll('ul.nav.nav-tabs li.nav-item a');
     update_current_tab_color(all_tabs, "Voice");
-
-    const quicksearch = document.getElementById('quick-search');
-    quicksearch.addEventListener('input', function ()
-    {
-        init_voice_quick_search(quicksearch);
-    });
 
     /*
     * update tab front background color

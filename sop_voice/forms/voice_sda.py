@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelForm, NetBoxModelImportForm
@@ -56,6 +57,10 @@ class VoiceSdaFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label=_('Delivery')
     )
+    partial_number = forms.IntegerField(
+        label=_('Partial number'),
+        required=False
+    )
     start = forms.IntegerField(
         label=_('Start number'),
         required=False,
@@ -66,6 +71,12 @@ class VoiceSdaFilterForm(NetBoxModelFilterSetForm):
         required=False,
         help_text=_('E164 format')
     )
+
+    def clean(self):
+        super().clean()
+        if self.cleaned_data and self.cleaned_data['partial_number']:
+            if not isinstance(self.cleaned_data.get('partial_number'), int):
+                raise ValidationError({'partial_number': _('Partial number must be a number')})
 
 
 class VoiceSdaForm(NetBoxModelForm):
