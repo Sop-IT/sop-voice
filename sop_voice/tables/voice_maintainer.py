@@ -14,8 +14,12 @@ class VoiceMaintainerTable(NetBoxTable):
     '''
     table for all Voice Deliveries
     '''
-    name = tables.Column(verbose_name=_('Name'), linkify=True)
-    status = ChoiceFieldColumn(linkify=True)
+    name = tables.Column(
+        verbose_name=_('Name'), linkify=True
+    )
+    status = ChoiceFieldColumn(
+        linkify=True
+    )
     description = tables.Column()
 
     class Meta(NetBoxTable.Meta):

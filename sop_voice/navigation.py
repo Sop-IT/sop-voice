@@ -23,12 +23,6 @@ VOICE = Menu(
                             icon_class='mdi mdi-plus-thick',
                             permissions=[f'sop_voice.add_voicemaintainer'],
                         ),
-                        MenuItemButton(
-                            link=f'plugins:sop_voice:voicemaintainer_import',
-                            title='Import',
-                            icon_class='mdi mdi-upload',
-                            permissions=[f'sop_voice.add_voicemaintainer'],
-                        )
                     ),
                 ),
             ),
@@ -40,6 +34,20 @@ VOICE = Menu(
                     link=f'plugins:sop_voice:voicesda_list',
                     link_text=_('DIDs List'),
                     permissions=[f'sop_voice.view_voicesda'],
+                    buttons=(
+                        MenuItemButton(
+                            link=f'plugins:sop_voice:voicesda_add',
+                            title='Add',
+                            icon_class='mdi mdi-plus-thick',
+                            permissions=[f'sop_voice.add_voicesda'],
+                        ),
+                        MenuItemButton(
+                            link=f'plugins:sop_voice:voicesda_import',
+                            title='Import',
+                            icon_class='mdi mdi-upload',
+                            permissions=[f'sop_voice.add_voicesda'],
+                        ),
+                    ),
                 ),
             ),
         ),
@@ -50,6 +58,14 @@ VOICE = Menu(
                     link=f'plugins:sop_voice:voicedelivery_list',
                     link_text=_('Deliveries List'),
                     permissions=[f'sop_voice.view_voicedelivery'],
+                    buttons=(
+                        MenuItemButton(
+                            link=f'plugins:sop_voice:voicedelivery_add',
+                            title='Add',
+                            icon_class='mdi mdi-plus-thick',
+                            permissions=[f'sop_voice.add_voicedelivery'],
+                        ),
+                    ),
                 ),
             ),
         ),

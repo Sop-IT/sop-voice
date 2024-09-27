@@ -4,7 +4,7 @@
 
 
 {% block breadcrumbs %}
-  {% include 'sop_utils/tools/breadcrumbs.html' with name=object|meta:"verbose_name"|bettertitle %}
+  {% include 'sop_voice/tools/breadcrumbs.html' with name=object|meta:"verbose_name"|bettertitle %}
 {% endblock %}
 
 
@@ -35,7 +35,7 @@
         <tr>
           <th scope="row">{% trans "Description" %}</th>
           <td>
-            {{object.description}}
+            {{object.description|placeholder}}
           </td>
         </tr>
 

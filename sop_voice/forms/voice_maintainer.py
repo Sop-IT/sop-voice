@@ -1,18 +1,17 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from utilities.forms.fields import CommentField
+from utilities.forms.fields import CommentField, SlugField
 
-from sop_utils.models import VoiceMaintainerStatusChoice
-from netbox.forms import NetBoxModelFilterSetForm
+from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm, NetBoxModelBulkEditForm
 
-from ..models import VoiceMaintainer
+from ..models import *
 
 
 __all__ = (
     'VoiceMaintainerForm',
-    'VoiceMaintainerImportForm',
-    'VoiceMaintainerFilterForm'
+    'VoiceMaintainerFilterForm',
+    'VoiceMaintainerBulkEditForm',
 )
 
 
@@ -25,8 +24,28 @@ class VoiceMaintainerFilterForm(NetBoxModelFilterSetForm):
     )
 
 
-class VoiceMaintainerForm(forms.ModelForm):
+class VoiceMaintainerBulkEditForm(NetBoxModelBulkEditForm):
+    model = VoiceMaintainer
+    status = forms.ChoiceField(
+        choices=VoiceMaintainerStatusChoice,
+        required=True,
+    )
+
+    class Meta:
+        fields = ('status', )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if 'add_tags' in self.fields:
+            del self.fields['add_tags']
+        if 'remove_tags' in self.fields:
+            del self.fields['remove_tags']
+
+
+class VoiceMaintainerForm(NetBoxModelForm):
     name = forms.CharField(label=_('Maintainer'))
+    slug = SlugField()
     status = forms.ChoiceField(
         choices=VoiceMaintainerStatusChoice,
         required=True
@@ -35,26 +54,11 @@ class VoiceMaintainerForm(forms.ModelForm):
 
     class Meta:
         model = VoiceMaintainer
-        fields = ('name', 'status', 'description', 'comments')
+        fields = ('name', 'slug', 'status', 'description', 'comments')
 
 
-class VoiceMaintainerImportForm(forms.ModelForm):
-    json_import = forms.JSONField(
-        label=_('JSON'),
-        help_text=('\
-Enter the SDA List range number in a JSON format.\
-[\
-    "Quonex",\
-    "Alcatel"\
-]'),
-        required=True
-    )
-    status = forms.ChoiceField(
-        choices=VoiceMaintainerStatusChoice,
-        required=True
-    )
-    comments = CommentField()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    class Meta:
-        model = VoiceMaintainer
-        fields = ('json_import', 'status', 'description', 'comments')
+        if 'tags' in self.fields:
+            del self.fields['tags']

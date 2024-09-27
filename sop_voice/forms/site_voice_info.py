@@ -1,6 +1,8 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from dcim.models import Site
+
 from ..models import SiteVoiceInfo, VoiceMaintainer
 
 
@@ -18,6 +20,11 @@ class SiteVoiceInfoForm(forms.ModelForm):
         label=_('Voice Maintainer'),
         help_text=_('The voice maintainer of the site.'),
         required=True,
+    )
+    site = forms.ModelChoiceField(
+        queryset=Site.objects.all(),
+        widget=forms.HiddenInput(),
+        required=False
     )
 
     class Meta:

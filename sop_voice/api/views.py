@@ -13,7 +13,6 @@ __all__ = (
     'VoiceMaintainerViewSet',
 )
 
-
 class VoiceMaintainerViewSet(NetBoxModelViewSet):
     metadata_class = ContentTypeMetadata
     queryset = VoiceMaintainer.objects.all()

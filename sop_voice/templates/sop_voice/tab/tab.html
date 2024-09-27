@@ -10,11 +10,11 @@
     add extra controls buttons
 -->
 {% block extra_controls %}
-    <a href="{% url 'plugins:sop_voice:voicesda_add' pk=object.id %}" type="button" class="btn btn-primary">
+    <a href="{% url 'plugins:sop_voice:voicesda_add' %}" type="button" class="btn btn-primary">
       <i class="mdi mdi-plus-thick"></i>{% trans "Add DIDs" %}</a>
-    <a href="{% url 'plugins:sop_voice:voicesda_import' pk=object.id %}" type="button" class="btn btn-cyan">
-        <i class="mdi mdi-upload"></i> {% trans "Import DIDs" %}
-    <a href="{% url 'plugins:sop_voice:voicedelivery_add' pk=object.id %}" type="button" class="btn btn-primary">
+    <a href="{% url 'plugins:sop_voice:voicesda_import' %}" type="button" class="btn btn-cyan">
+        <i class="mdi mdi-upload"></i> {% trans "Import DIDs" %}</a>
+    <a href="{% url 'plugins:sop_voice:voicedelivery_add' %}" type="button" class="btn btn-primary">
       <i class="mdi mdi-plus-thick"></i>{% trans "Add voice deliveries" %}</a>
 {% endblock extra_controls %}
 
@@ -22,7 +22,7 @@
 <!--
     ________________________________
     displays all voice models tables
-    using sop_utils/tools/table.html
+    using sop_voice/tools/table.html
     and sop_voice/tab/*.html
 -->
 {% block content %}
@@ -32,8 +32,8 @@
         {% include 'sop_voice/tab/site_info.html' with object=context.site_info site=object %}
     </div>
     <div class="col-md-12">
-        {% include 'sop_utils/tools/table.html' with object=context.delivery reversed_url='plugins:sop_voice:voicedelivery_add' pk=object.id %}
-        {% include 'sop_utils/tools/table.html' with object=context.sda reversed_url='plugins:sop_voice:voicesda_add' pk=object.id search=1%}
+        {% include 'sop_voice/tools/table.html' with object=context.delivery reversed_url='plugins:sop_voice:voicedelivery_add' pk=object.id %}
+        {% include 'sop_voice/tools/table.html' with object=context.sda reversed_url='plugins:sop_voice:voicesda_add' pk=object.id search=1%}
     </div>
 </div>
 
@@ -41,7 +41,7 @@
     ____________________________________________________
     load my scripts for quicksearch, tableconfig and tab
 -->
-<script src="{% static 'my_tab.js' %}"></script>
+<script src="{% static 'number_quicksearch.js' %}"></script>
 <script>
 /*
  * just to normalize the string
@@ -62,6 +62,19 @@ document.addEventListener('DOMContentLoaded', function ()
         init_voice_quick_search(quicksearch);
     });
 
+    /*
+    * update tab front background color
+    */
+    function update_current_tab_color(all_tabs, name)
+    {
+        all_tabs.forEach(tab => {
+            if (tab.innerText == "Site") {
+                tab.classList.remove('active');
+            } else if (tab.innerText.split(' ')[0] == name) {
+                tab.classList.add('active');
+            }
+        });
+    }
 });
 </script>
 

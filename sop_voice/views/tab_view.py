@@ -9,11 +9,15 @@ from netbox.views.generic.mixins import ActionsMixin
 from netbox.constants import DEFAULT_ACTION_PERMISSIONS
 from dcim.models import Site
 
-from sop_utils.utils import *
-
 from ..tables.voice_delivery import *
 from ..tables.voice_sda import *
 from ..models import *
+from ..utils import count_all_sda_list, get_object_or_create
+
+
+'''
+accessed for "Voice" site tab View
+'''
 
 
 __all__ = (
@@ -46,9 +50,7 @@ class VoiceSiteTabView(View, ActionsMixin, PermissionRequiredMixin, AccessMixin)
         context: dict = {}
     
         site = get_object_or_404(Site, pk=pk)
-        try:
-            context['site_info'] = SiteVoiceInfo.objects.filter(site=site).first()
-        except:pass
+        context['site_info'] = get_object_or_create(SiteVoiceInfo, site)
         context['sda'] = VoiceSda
         context['sda_table'] = self.get_table(VoiceSdaTable, VoiceSda.objects.filter(delivery__site=site), request)
         context['delivery'] = VoiceDelivery

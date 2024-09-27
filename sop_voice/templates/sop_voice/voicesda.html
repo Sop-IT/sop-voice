@@ -9,7 +9,7 @@
 
 
 {% block breadcrumbs %}
-    {% include 'sop_utils/tools/breadcrumbs.html' with object=object.delivery name="SDA List" %}
+    {% include 'sop_voice/tools/breadcrumbs.html' with object=object.delivery name="SDA List" %}
 {% endblock %}
 
 
@@ -43,14 +43,14 @@
         <tr>
           <th scope="row">{% trans "Start" %}</th>
           <td>
-            {{object.start}}
+            {{start}}
           </td>
         </tr>
 
         <tr>
           <th scope="row">{% trans "End" %}</th>
           <td>
-            {{object.end}}
+            {{end}}
           </td>
         </tr>
 
@@ -63,6 +63,7 @@
           {% endif %}
         </tr>
 
+{% if object.delivery %}
         <tr>
           <th scope="row">{% trans "Delivery method" %}</th>
           <td>
@@ -85,14 +86,14 @@
             {% badge object.delivery.get_status_display bg_color=object.delivery.get_status_color %}
           </td>
         </tr>
-
+{% endif %}
       </table>
     </div>
   </div>
 
   <div class="col-md-6">
     {% if object.delivery %}
-      {% include 'sop_utils/tools/site.html' with object=object.delivery maintainer=maintainer.maintainer %}
+      {% include 'sop_voice/tools/site.html' with object=object maintainer=maintainer.maintainer %}
     {% endif %}
   </div>
 </div>

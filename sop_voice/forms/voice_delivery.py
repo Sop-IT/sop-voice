@@ -3,17 +3,17 @@ from django.utils.translation import gettext_lazy as _
 
 from dcim.models import Site
 from circuits.models import Provider
-from netbox.forms import NetBoxModelFilterSetForm
-from utilities.forms.fields import DynamicModelChoiceField
-
-from sop_utils.models import VoiceDeliveryStatusChoices
+from utilities.forms.fields import SlugField
+from utilities.forms.fields import DynamicModelChoiceField, CommentField
+from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm, NetBoxModelBulkEditForm
 
 from ..models import *
 
 
 __all__ = (
     'VoiceDeliveryForm',
-    'VoiceDeliveryFilterForm'
+    'VoiceDeliveryFilterForm',
+    'VoiceDeliveryBulkEditForm',
 )
 
 
@@ -39,14 +39,54 @@ class VoiceDeliveryFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label=_('Status')
     )
-    
 
 
-class VoiceDeliveryForm(forms.ModelForm):
+class VoiceDeliveryBulkEditForm(NetBoxModelBulkEditForm):
+    model = VoiceDelivery
+
+    site = forms.ModelChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        label=_('Site')
+    )
+    delivery = forms.CharField(
+        required=False,
+        label=_('Delivery Method'),
+        help_text=_('SIP TRUNK, T0, T2, ...')
+    )
+    provider = forms.ModelChoiceField(
+        queryset=Provider.objects.all(),
+        required=False,
+        label=_('Provider')
+    )
+    status = forms.ChoiceField(
+        choices=VoiceDeliveryStatusChoices,
+        required=False,
+        label=_('Status')
+    )
+
+    class Meta:
+        fields = ('site', 'delivery', 'provider', 'status', )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'add_tags' in self.fields:
+            del self.fields['add_tags']
+        if 'remove_tags' in self.fields:
+            del self.fields['remove_tags']
+
+
+class VoiceDeliveryForm(NetBoxModelForm):
     '''
     creates a form for a Voice Delivery object
     '''
+    site = forms.ModelChoiceField(
+        required=True,
+        queryset=Site.objects.all(),
+        label=_('Site')
+    )
     delivery = forms.CharField(
+        required=True,
         label=_('Delivery Method'),
         help_text=_('SIP TRUNK, T0, T2, ...')
     )
@@ -55,7 +95,9 @@ class VoiceDeliveryForm(forms.ModelForm):
         queryset=Provider.objects.all(),
         label=_('Provider')
     )
-    channel_count = forms.CharField(
+    # TODO: SlugField multi slug_source (site, delivery, provider)
+    slug = SlugField(required=True, slug_source='delivery')
+    channel_count = forms.IntegerField(
         required=False,
         label=_('Channel Count'),
         help_text=_('G.711 cidec - 96kbps reserved bandwidth per channel')
@@ -65,19 +107,23 @@ class VoiceDeliveryForm(forms.ModelForm):
         required=True,
         label=_('Status'),
     )
-    ndi = forms.CharField(
+    ndi = forms.IntegerField(
         required=False,
-        max_length=100,
         label=_('MBN / NDI'),
         help_text=_("Main Billing Number / Numéro de Désignation d'Installation - E164 format")
     )
-    dto = forms.CharField(
+    dto = forms.IntegerField(
         required=False,
-        max_length=100,
         label=_('DTO'),
         help_text=_('E164 format')
     )
+    comments = CommentField()
 
     class Meta:
         model = VoiceDelivery
-        fields = ('delivery', 'provider', 'channel_count', 'status', 'ndi', 'dto')
+        fields = ('site', 'delivery', 'provider', 'slug', 'channel_count', 'status', 'ndi', 'dto', 'description', 'comments')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'tags' in self.fields:
+            del self.fields['tags']

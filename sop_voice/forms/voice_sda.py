@@ -1,8 +1,8 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from netbox.forms import NetBoxModelFilterSetForm
-from utilities.forms.fields import DynamicModelChoiceField
+from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelForm, NetBoxModelImportForm
+from utilities.forms.fields import DynamicModelChoiceField, DynamicModelChoiceField, CSVModelChoiceField
 from dcim.models import Site
 
 from ..models import *
@@ -10,20 +10,32 @@ from ..models import *
 
 __all__ = (
     'VoiceSdaForm',
-    'VoiceSdaImportForm',
     'VoiceSdaFilterForm',
-    'VoiceSdaBulkEditForm'
+    'VoiceSdaBulkEditForm',
+    'VoiceSdaBulkImportForm',
 )
 
 
-class VoiceSdaBulkEditForm(forms.ModelForm):
+class VoiceSdaBulkEditForm(NetBoxModelBulkEditForm):
+    model = VoiceSda
+
+    site = forms.ModelChoiceField(
+        queryset=Site.objects.all()
+    )
     delivery = forms.ModelChoiceField(
-        queryset=VoiceDelivery.objects.all()
+        queryset=VoiceDelivery.objects.all(),
+        help_text=_('Specify how this range is delivered.'),
     )
 
     class Meta:
-        model = VoiceSda
-        fields = ('delivery', )
+        fields = ('site', 'delivery', )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'add_tags' in self.fields:
+            del self.fields['add_tags']
+        if 'remove_tags' in self.fields:
+            del self.fields['remove_tags']
 
 
 class VoiceSdaFilterForm(NetBoxModelFilterSetForm):
@@ -44,63 +56,88 @@ class VoiceSdaFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label=_('Delivery')
     )
-    start = forms.CharField(
+    start = forms.IntegerField(
         label=_('Start number'),
-        required=False
+        required=False,
+        help_text=_('E164 format')
     )
-    end = forms.CharField(
+    end = forms.IntegerField(
         label=_('End number'),
-        required=False
+        required=False,
+        help_text=_('E164 format')
     )
 
 
-class VoiceSdaForm(forms.ModelForm):
-    ''''
-    creates a form for a SDA List instance
-    '''
-    start = forms.CharField(
+class VoiceSdaForm(NetBoxModelForm):
+    site = DynamicModelChoiceField(
+        label=_('Site'),
+        queryset=Site.objects.all(),
+        required=True,
+    )
+    start = forms.IntegerField(
         label=_('Start number'),
         required=True,
         help_text=_('E164 format'),
     )
-    end = forms.CharField(
+    end = forms.IntegerField(
         label=_('End number'),
         required=False,
         help_text=_('E164 format - can be left blank if the range is only one number.'),
     )
-    delivery = forms.ModelChoiceField(
+    delivery = DynamicModelChoiceField(
         label=_('Delivery'),
         queryset=VoiceDelivery.objects.all(),
-        required=True,
+        required=False,
         help_text=_('Specify how this range is delivered.'),
+        query_params={
+            'site_id': '$site'
+        }
     )
 
     class Meta:
         model = VoiceSda
-        fields = ('start', 'end', 'delivery', )
+        fields = ('site', 'start', 'end', 'delivery')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if 'tags' in self.fields:
+            del self.fields['tags']
 
 
-class VoiceSdaImportForm(forms.ModelForm):
-    '''
-    creates a form for importing a list of SDA List objects
-    '''
-    json_import = forms.JSONField(
-        label=_('JSON'),
-        help_text=('\
-Enter the SDA List range number in a JSON format.\
-[\
-    "start >> end",\
-    "start >> end",\
-]'),
-        required=True,
-    )
-    delivery = forms.ModelChoiceField(
-        label=_('Delivery'),
+class VoiceSdaBulkImportForm(NetBoxModelImportForm):
+    delivery = CSVModelChoiceField(
         queryset=VoiceDelivery.objects.all(),
+        to_field_name='slug',
+        required=False,
+    )
+    site = CSVModelChoiceField(
+        queryset=Site.objects.all(),
+        to_field_name='slug',
         required=True,
-        help_text=_('The voice delivery the voice number range is assigned to.'),
+    )
+    start = forms.IntegerField(
+        label=_('Start number'),
+        help_text='E164 format',
+        required=True
+    )
+    end = forms.IntegerField(
+        label=_('End number'),
+        help_text='E164 format - can be left blank if the range is only one number.',
+        required=False
     )
 
     class Meta:
         model = VoiceSda
-        fields = ('json_import', 'delivery', )
+        fields = ['delivery', 'site', 'start', 'end']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if 'tags' in self.fields:
+            del self.fields['tags']
+
+    def clean(self):
+        super().clean()
+        if not self.cleaned_data.get('end'):
+            self.cleaned_data['end'] = self.cleaned_data['start']

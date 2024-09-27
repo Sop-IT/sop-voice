@@ -5,9 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from netbox.filtersets import NetBoxModelFilterSet
 from dcim.models import Site
 
-from sop_utils.models import VoiceDeliveryStatusChoices, VoiceMaintainerStatusChoice
-
-from .models import VoiceSda, VoiceDelivery, VoiceMaintainer, SiteVoiceInfo
+from .models import *
 
 
 __all__ = (
@@ -165,16 +163,16 @@ class VoiceMaintainerFilterSet(NetBoxModelFilterSet):
 class VoiceSdaFilterSet(NetBoxModelFilterSet):
     site_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Site.objects.all(),
-        field_name='delivery__site',
+        field_name='site',
         label=_('Site (ID)')
     )
     site_name = django_filters.CharFilter(
-        field_name='delivery__site__name',
+        field_name='site__name',
         label=_('Site (name)')
     )
     maintainer_id = django_filters.ModelMultipleChoiceFilter(
         queryset=VoiceMaintainer.objects.all(),
-        field_name='delivery__site',
+        field_name='site',
         method='sda_maintainer_filter',
         label=_('Maintainer (ID)')
     )
@@ -184,20 +182,20 @@ class VoiceSdaFilterSet(NetBoxModelFilterSet):
     )
     delivery_id = django_filters.ModelMultipleChoiceFilter(
         queryset=VoiceDelivery.objects.all(),
-        field_name='delivery_id',
+        field_name='delivery',
         label=_('Delivery (ID)')
     )
 
     class Meta:
         model = VoiceSda
-        fields = ('id', 'start', 'end', 'delivery_id')
+        fields = ('id', 'start', 'end', 'site', 'delivery_id')
 
     def sda_maintainer_name_filter(self, queryset, name, value):
         if not value:
             return queryset
         try:
             site_ids = SiteVoiceInfo.objects.filter(maintainer__name=value).values_list('site_id', flat=True)
-            return queryset.filter(delivery__site_id__in=site_ids)
+            return queryset.filter(site_id__in=site_ids)
         except:return queryset
 
     def sda_maintainer_filter(self, queryset, name, value):
@@ -205,14 +203,13 @@ class VoiceSdaFilterSet(NetBoxModelFilterSet):
             return queryset
         try:
             site_ids = SiteVoiceInfo.objects.filter(maintainer__in=value).values_list('site_id', flat=True)
-            return queryset.filter(delivery__site_id__in=site_ids)
+            return queryset.filter(site_id__in=site_ids)
         except:return queryset
 
     def search(self, queryset, name, value):
         if not value.strip():
             return queryset
         return queryset.filter(
-            Q(delivery__icontains=value) |
             Q(start__icontains=value) |
             Q(end__icontains=value)
         )
