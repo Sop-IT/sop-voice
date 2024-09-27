@@ -21,13 +21,13 @@ class VoiceValidator:
 
     @staticmethod
     def check_number(where:str, number:int) -> None:
-        if number is None or number == 0:
+        if number is None or number == 0 or number == '':
             raise ValidationError({
                 f'{where}': _("Number must be set in E164 format.")
             })
-        if not phonenumbers.is_possible_number(phonenumbers.parse(f'+{number}')):
+        if not phonenumbers.parse(f'+{number}'):
             raise ValidationError({
-                f'{where}': _("Number must be a real number in E164 format.")
+                f'{where}': _("Number must be a valid phone number written in E164 format.")
             })
 
     @staticmethod
@@ -36,4 +36,3 @@ class VoiceValidator:
             raise ValidationError({
                 'end': _("End number must be greater than or equal to the start number.")
             })
-

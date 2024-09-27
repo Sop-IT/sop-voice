@@ -127,7 +127,7 @@ class VoiceDelivery(NetBoxModel):
         Provider,
         on_delete=models.CASCADE,
         related_name='voice_delivery_provider',
-        verbose_name=_('Provider')
+        verbose_name=_('Provider'),
     )
     site = models.ForeignKey(
         Site,
@@ -172,7 +172,10 @@ class VoiceDelivery(NetBoxModel):
         return VoiceDeliveryStatusChoices.colors.get(self.status)
 
     def __str__(self) -> str:
-        return f'{self.delivery} / {self.provider}'
+        delivery:str = self.delivery if self.delivery is not None else 'Unknown delivery'
+        provider:str = self.provider if self.provider is not None else 'Unknown provider'
+
+        return f'{delivery} / {provider}'
 
     def clean(self):
         super().clean()
