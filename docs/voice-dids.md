@@ -4,9 +4,9 @@ Voice DIDs is a model where you can *add* or *import* new DID range on each site
 
 ## Fields
 
-### Delivery 📌
+### Site 📌
 
-How the range is [delivered](./voice-delivery.md)
+The site of the DID using NetBox Site model
 
 ### Start number 📌
 
@@ -17,3 +17,8 @@ The starting number of the range.
 
 **(E164 format)**
 The end number of the range, can blank if the DID is not a range but a single number.
+
+### Delivery
+
+How the range is [delivered](./voice-delivery.md)
+The site of the delivery must be the same as the site of the DID.

@@ -6,13 +6,10 @@
 
 ### Prerequisites
 
-This plugin requires Sop-utils to work. It will be automatically installed but you need to manually add it to netbox/configuration.py.
+This plugin requires phonenumbers to work.
 
-```python
-PLUGINS = [
-    ...
-    'sop_utils',
-]
+```bash
+echo -e "phonenumbers" >> local_requirements.txt
 ```
 
 ### Auto-upgrade installation
@@ -47,3 +44,7 @@ This plugin provides the following features:
 -   [**Voice Maintainer**](https://github.com/sop-it/sop-voice/tree/main/docs/voice-maintainer.md)
 -   [**Voice Delivery**](https://github.com/sop-it/sop-voice/tree/main/docs/voice-delivery.md)
 -   [**Voice DIDs**](https://github.com/sop-it/sop-voice/tree/main/docs/voice-dids.md)
+
+## API
+
+-   [**Voice API**](https://github.com/sop-it/sop-voice/tree/main/docs/api.md)
