@@ -4,3 +4,4 @@ build/
 dist/
 *.sh
 data.csv
+!deploy.sh
