@@ -36,3 +36,27 @@ class VoiceValidator:
             raise ValidationError({
                 'end': _("End number must be greater than or equal to the start number.")
             })
+
+
+def number_quicksearch(start: int, end: int, pattern: str) -> bool:
+    '''
+    Recherche rapide d'un nombre dans une plage donnée
+    '''
+    pattern_len = len(pattern)
+    pattern_int = int(pattern)
+    divisor = 10 ** pattern_len
+
+    if start % divisor == pattern_int or end % divisor == pattern_int:
+        return True
+
+    current = start
+    while current <= end:
+        temp = current
+        while temp > 0:
+            if temp % divisor == pattern_int:
+                return True
+            temp //= 10
+        current += 1
+
+    return False
+

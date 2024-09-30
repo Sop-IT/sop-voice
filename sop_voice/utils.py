@@ -39,7 +39,10 @@ def get_object_or_create(model, site) -> object | None:
         return None
     target = model.objects.filter(site=site)
     if target.exists():
-        return target.first()
+        try:
+            return target.filter(maintainer__isnull=False).first()
+        except:
+            return target.first()
     target = model(site=site)
     target.save()
     return target

@@ -115,6 +115,12 @@ class VoiceSdaForm(NetBoxModelForm):
         if 'tags' in self.fields:
             del self.fields['tags']
 
+    def clean(self):
+        super().clean()
+
+        if not self.cleaned_data.get('end'):
+            self.cleaned_data['end'] = self.cleaned_data['start']
+
 
 class VoiceSdaBulkImportForm(NetBoxModelImportForm):
     delivery = CSVModelChoiceField(

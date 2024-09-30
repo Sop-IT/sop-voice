@@ -7,6 +7,7 @@ from netbox.filtersets import NetBoxModelFilterSet
 from dcim.models import Site
 
 from .models import *
+from .validators import number_quicksearch
 
 
 __all__ = (
@@ -15,7 +16,6 @@ __all__ = (
     'VoiceMaintainerFilterSet',
     'VoiceSdaFilterSet',
 )
-
 
 
 #_________________________
@@ -195,29 +195,6 @@ class VoiceSdaFilterSet(NetBoxModelFilterSet):
         model = VoiceSda
         fields = ('id', 'start', 'end', 'site', 'delivery_id')
 
-    @staticmethod
-    def number_quicksearch(start: int, end: int, pattern: str) -> bool:
-        '''
-        Recherche rapide d'un nombre dans une plage donnée
-        '''
-        pattern_len = len(pattern)
-        pattern_int = int(pattern)
-        divisor = 10 ** pattern_len
-
-        if start % divisor == pattern_int or end % divisor == pattern_int:
-            return True
-
-        current = start
-        while current <= end:
-            temp = current
-            while temp > 0:
-                if temp % divisor == pattern_int:
-                    return True
-                temp //= 10
-            current += 1
-
-        return False
-
     def search_partial_number(self, queryset, name, value):
         if not value:
             return queryset
@@ -225,7 +202,7 @@ class VoiceSdaFilterSet(NetBoxModelFilterSet):
         valid_ids: list[int] = []
 
         for rng in queryset:
-            if self.number_quicksearch(rng.start, rng.end, str(value)):
+            if number_quicksearch(rng.start, rng.end, str(value)):
                 valid_ids.append(rng.id)
 
         return queryset.filter(id__in=valid_ids)

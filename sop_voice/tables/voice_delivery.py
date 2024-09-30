@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from netbox.tables import NetBoxTable, ChoiceFieldColumn
 
 from ..models import VoiceDelivery
+from ..utils import format_number
 
 
 __all__ = (
@@ -45,3 +46,9 @@ class VoiceDeliveryTable(NetBoxTable):
         fields = ('pk', 'id', 'actions', 'delivery', 'provider', 'site',
             'channel_count', 'status', 'ndi', 'dto', 'description', 'comments')
         default_columns = ('actions', 'delivery', 'provider', 'status', 'channel_count')
+
+    def render_ndi(self, record):
+        return format_number(record.ndi)
+
+    def render_dto(self, record):
+        return format_number(record.dto)

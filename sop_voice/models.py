@@ -9,7 +9,8 @@ from circuits.models import Provider
 from dcim.models import Site
 from utilities.choices import ChoiceSet
 
-from .validators import VoiceValidator
+from .validators import VoiceValidator, number_quicksearch
+
 
 
 __all__ = (
@@ -90,6 +91,14 @@ class VoiceMaintainer(NetBoxModel):
     class Meta(NetBoxModel.Meta):
         verbose_name = _('Voice Maintainer')
         verbose_name_plural = _('Voice Maintainers')
+
+    def clean(self):
+        super().clean()
+        
+        if self.maintainer and VoiceMaintainer.objects.filter(maintainer=self.maintainer).exists():
+            raise ValidationError({
+                'maintainer': _(f'A "{self.maintainer}" maintainer already exists.')
+            })
 
 
 class SiteVoiceInfo(NetBoxModel):
@@ -179,10 +188,23 @@ class VoiceDelivery(NetBoxModel):
 
     def clean(self):
         super().clean()
+        if self.delivery and self.site:
+            if VoiceDelivery.objects.filter(site=self.site, delivery=self.delivery).exists():
+                raise ValidationError({
+                    'delivery': _(f'A "{self.delivery}" delivery method already exists for this site.')
+                })
         if self.ndi:
             VoiceValidator.check_number('ndi', self.ndi)
+            if VoiceDelivery.objects.filter(ndi=self.ndi).exists():
+                raise ValidationError({
+                    'ndi': _(f'This NDI already exists on another delivery.')
+                })
         if self.dto:
             VoiceValidator.check_number('dto', self.dto)
+            if VoiceDelivery.objects.filter(dto=self.dto).exists():
+                raise ValidationError({
+                    'dto': _(f'This DTO already exists on another delivery.')
+                })
 
     class Meta(NetBoxModel.Meta):
         verbose_name = _('Voice Delivery')
@@ -225,13 +247,36 @@ class VoiceSda(NetBoxModel):
 
     def clean(self):
         super().clean()
+
         VoiceValidator.check_site(self.site)
         VoiceValidator.check_number('start', self.start)
+
+        if VoiceSda.objects.filter(start=self.start).exists():
+            raise ValidationError({
+                'start': _(f'This start number already exists on another DID range.')
+            })
         if self.end:
+            if VoiceSda.objects.filter(end=self.end).exists():
+                raise ValidationError({
+                    'end': _(f'This end number already exists on another DID range.')
+                })
             VoiceValidator.check_number('end', self.end)
         VoiceValidator.check_delivery(self.delivery, self.site)
-        if self.end and self.start:
+
+        if self.end:
+            for rng in VoiceSda.objects.all():
+                ...
+                if number_quicksearch(rng.start, rng.end, str(self.start)):
+                    raise ValidationError({
+                        'start': _(f'This start number overwrites an existing DID range.')
+                    })
+                if number_quicksearch(rng.start, rng.end, str(self.end)):
+                    raise ValidationError({
+                        'end': _(f'This end number overwrites an existing DID range.')
+                    })
+
             VoiceValidator.check_start_end(self.start, self.end)
+
 
     def save(self, *args, **kwargs):
         if not self.end or self.end == 0:
@@ -242,3 +287,4 @@ class VoiceSda(NetBoxModel):
         ordering = ('start',)
         verbose_name = _('DID Range')
         verbose_name_plural = _('DIDs')
+
