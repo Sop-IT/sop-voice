@@ -43,7 +43,11 @@ class VoiceMaintainerDetailView(generic.ObjectView, GetRelatedModelsMixin):
             range_count += temp.__int__()[1]
 
         return num_count, range_count
-        
+    
+    def get_format(self, values) -> str:
+        qs = [str(item['site__id']) for item in values]
+        return f'id=' + '&id='.join(qs)
+
     def get_extra_context(self, request, instance):
         '''
         additionnal context for the related models/objects
@@ -71,6 +75,8 @@ class VoiceMaintainerDetailView(generic.ObjectView, GetRelatedModelsMixin):
                 ), 'maintainer_id')
             )
         )
+        context['site'] = Site
+        context['restricted'] = self.get_format(site_ids)
         return context
 
 

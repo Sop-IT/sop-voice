@@ -97,8 +97,25 @@
 
   </div>
 
+  {% if site %}
+  <div class="col col-md-12">
+    <div class="card">
+      
+      <h2 class="card-header">
+        <a href="{% url site|viewname:"list" %}?site_id={{restricted}}">{{site|meta:"verbose_name_plural"|bettertitle}}</a>
+      </h2>
+    
+
+      <div class="htmx-container table-responsive"
+        hx-get="{% url site|viewname:"list" %}?embedded=True&{{restricted}}"
+        hx-target="this"
+        hx-trigger="load" hx-select=".htmx-container" hx-swap="outerHTML"
+      ></div>
+
+    </div>
+  </div>
+  {% endif %}
+
 </div>
 
 {% endblock content %}
-
-{% comment %} /dcim/sites/?id=1&id=2 {% endcomment %}

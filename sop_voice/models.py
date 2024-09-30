@@ -1,4 +1,3 @@
-import sys
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -91,13 +90,25 @@ class VoiceMaintainer(NetBoxModel):
     class Meta(NetBoxModel.Meta):
         verbose_name = _('Voice Maintainer')
         verbose_name_plural = _('Voice Maintainers')
+        constraints = (
+            models.UniqueConstraint(
+                fields=('name',),
+                name='%(app_label)s_%(class)s_unique_name',
+                violation_error_message=_("Maintainer name must be unique.")
+            ),
+            models.UniqueConstraint(
+                fields=('slug',),
+                name='%(app_label)s_%(class)s_unique_slug',
+                violation_error_message=_("Maintainer slug must be unique.")
+            )
+        )
 
     def clean(self):
         super().clean()
         
-        if self.maintainer and VoiceMaintainer.objects.filter(maintainer=self.maintainer).exists():
+        if self.name and VoiceMaintainer.objects.filter(name=self.name).exists():
             raise ValidationError({
-                'maintainer': _(f'A "{self.maintainer}" maintainer already exists.')
+                'name': _(f'A "{self.name}" maintainer already exists.')
             })
 
 
@@ -206,9 +217,27 @@ class VoiceDelivery(NetBoxModel):
                     'dto': _(f'This DTO already exists on another delivery.')
                 })
 
+
     class Meta(NetBoxModel.Meta):
         verbose_name = _('Voice Delivery')
         verbose_name_plural = _('Voice Deliveries')
+        constraints = (
+            models.UniqueConstraint(
+                fields=('ndi',),
+                name='%(app_label)s_%(class)s_unique_ndi',
+                violation_error_message=_("NDI must be unique.")
+            ),
+            models.UniqueConstraint(
+                fields=('dto',),
+                name='%(app_label)s_%(class)s_unique_dto',
+                violation_error_message=_("DTO must be unique.")
+            ),
+            models.UniqueConstraint(
+                fields=('delivery', 'site'),
+                name='%(app_label)s_%(class)s_unique_delivery_method_site',
+                violation_error_message=_("Delivery method must be unique in a site.")
+            )
+        )
 
 
 class VoiceSda(NetBoxModel):
@@ -265,7 +294,7 @@ class VoiceSda(NetBoxModel):
 
         if self.end:
             for rng in VoiceSda.objects.all():
-                ...
+
                 if number_quicksearch(rng.start, rng.end, str(self.start)):
                     raise ValidationError({
                         'start': _(f'This start number overwrites an existing DID range.')
@@ -277,10 +306,9 @@ class VoiceSda(NetBoxModel):
 
             VoiceValidator.check_start_end(self.start, self.end)
 
-
     def save(self, *args, **kwargs):
         if not self.end or self.end == 0:
-            self.start = self.end
+            self.end = self.start
         super().save(*args, **kwargs)
 
     class Meta(NetBoxModel.Meta):
@@ -288,3 +316,20 @@ class VoiceSda(NetBoxModel):
         verbose_name = _('DID Range')
         verbose_name_plural = _('DIDs')
 
+        constraints = (
+            models.UniqueConstraint(
+                fields=('start',),
+                name='%(app_label)s_%(class)s_unique_start_number',
+                violation_error_message=_("Start number must be unique.")
+            ),
+            models.UniqueConstraint(
+                fields=('end',),
+                name='%(app_label)s_%(class)s_unique_end_number',
+                violation_error_message=_("End number must be unique.")
+            ),
+            models.CheckConstraint(
+                check=models.Q(end__isnull=True) | models.Q(end__gte=models.F('start')),
+                name='%(app_label)s_%(class)s_end_greater_than_start',
+                violation_error_message=_("End number must be greater than start number.")
+            )
+        )

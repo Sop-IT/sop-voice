@@ -57,7 +57,7 @@ class VoiceSiteTabView(View, ActionsMixin, PermissionRequiredMixin, AccessMixin)
         context['delivery_table'] = self.get_table(VoiceDeliveryTable, VoiceDelivery.objects.filter(site=site), request)
         context['context'] = context
         context['actions'] = DEFAULT_ACTION_PERMISSIONS
-
+        
         '''
         change the devices with the filter you want
         '''
