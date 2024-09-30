@@ -20,12 +20,15 @@ __all__ = (
 class VoiceSdaBulkEditForm(NetBoxModelBulkEditForm):
     model = VoiceSda
 
-    site = forms.ModelChoiceField(
+    site = DynamicModelChoiceField(
         queryset=Site.objects.all()
     )
-    delivery = forms.ModelChoiceField(
+    delivery = DynamicModelChoiceField(
         queryset=VoiceDelivery.objects.all(),
         help_text=_('Specify how this range is delivered.'),
+        query_params={
+            'site_id': '$site'
+        }
     )
 
     class Meta:
@@ -80,6 +83,7 @@ class VoiceSdaFilterForm(NetBoxModelFilterSetForm):
 
 
 class VoiceSdaForm(NetBoxModelForm):
+
     site = DynamicModelChoiceField(
         label=_('Site'),
         queryset=Site.objects.all(),
@@ -88,12 +92,12 @@ class VoiceSdaForm(NetBoxModelForm):
     start = forms.IntegerField(
         label=_('Start number'),
         required=True,
-        help_text=_('E164 format'),
+        help_text=_('E164 format / NUMBER ONLY'),
     )
     end = forms.IntegerField(
         label=_('End number'),
         required=False,
-        help_text=_('E164 format - can be left blank if the range is only one number.'),
+        help_text=_('E164 format - can be left blank if the range is only one number. / NUMBER ONLY'),
     )
     delivery = DynamicModelChoiceField(
         label=_('Delivery'),
@@ -116,10 +120,8 @@ class VoiceSdaForm(NetBoxModelForm):
             del self.fields['tags']
 
     def clean(self):
-        super().clean()
 
-        if not self.cleaned_data.get('end'):
-            self.cleaned_data['end'] = self.cleaned_data['start']
+        super().clean()
 
 
 class VoiceSdaBulkImportForm(NetBoxModelImportForm):

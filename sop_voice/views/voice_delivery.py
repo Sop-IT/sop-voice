@@ -1,9 +1,10 @@
-from django.http import JsonResponse
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.translation import gettext_lazy as _
+from django.shortcuts import get_object_or_404
 
 from utilities.views import GetRelatedModelsMixin
 from netbox.views import generic
+from dcim.models import Site
 
 from ..forms.voice_delivery import *
 from ..tables.voice_delivery import *
@@ -20,6 +21,7 @@ __all__ =  (
     'VoiceDeliveryBulkEditView',
     'VoiceDeliveryDeleteView',
     'VoiceDeliveryListView',
+    'VoiceDeliverySiteView'
 )
 
 
@@ -63,6 +65,7 @@ class VoiceDeliveryDetailView(generic.ObjectView, PermissionRequiredMixin, GetRe
             context['ndi'] = format_number(instance.ndi)
         if instance.dto:
             context['dto'] = format_number(instance.dto)
+        context['did_range'] = VoiceSda
         context['num_sda'] = temp[0]
         context['num_range'] = temp[1]
         context['related_models'] = self.get_related_models(
@@ -84,3 +87,28 @@ class VoiceDeliveryDeleteView(generic.ObjectDeleteView, PermissionRequiredMixin)
     deletes a Voice Delivery object
     '''
     queryset = VoiceDelivery.objects.all()
+
+
+class VoiceDeliverySiteView(generic.ObjectEditView):
+    '''
+    adds a site automatically to the Voice Delivery
+    '''
+    queryset = VoiceDelivery.objects.all()
+    form = VoiceDeliveryForm
+
+    def get_object(self, **kwargs):
+        return self.queryset.model(site=get_object_or_404(Site, pk=kwargs['pk']))
+
+    def alter_object(self, obj, request, args, kwargs):
+        pk = kwargs.get('pk')
+        site = get_object_or_404(Site, pk=pk)
+        obj = self.queryset.model
+        print(obj)
+        return obj(site=site)
+
+    def get(self, request, *args, **kwargs): 
+        '''
+        get request handler
+        '''
+        response = super().get(request, *args, **kwargs)
+        return response

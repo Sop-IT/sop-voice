@@ -108,12 +108,12 @@ class VoiceDeliveryForm(NetBoxModelForm):
     ndi = forms.IntegerField(
         required=False,
         label=_('MBN / NDI'),
-        help_text=_("Main Billing Number / Numéro de Désignation d'Installation - E164 format")
+        help_text=_("Main Billing Number / Numéro de Désignation d'Installation - E164 format / NUMBER ONLY")
     )
     dto = forms.IntegerField(
         required=False,
         label=_('DTO'),
-        help_text=_('E164 format')
+        help_text=_('E164 format / NUMBER ONLY')
     )
     comments = CommentField()
 

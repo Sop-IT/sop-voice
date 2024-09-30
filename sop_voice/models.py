@@ -228,11 +228,6 @@ class VoiceDelivery(NetBoxModel):
                 violation_error_message=_("NDI must be unique.")
             ),
             models.UniqueConstraint(
-                fields=('dto',),
-                name='%(app_label)s_%(class)s_unique_dto',
-                violation_error_message=_("DTO must be unique.")
-            ),
-            models.UniqueConstraint(
                 fields=('delivery', 'site'),
                 name='%(app_label)s_%(class)s_unique_delivery_method_site',
                 violation_error_message=_("Delivery method must be unique in a site.")
@@ -279,20 +274,30 @@ class VoiceSda(NetBoxModel):
 
         VoiceValidator.check_site(self.site)
         VoiceValidator.check_number('start', self.start)
-
-        if VoiceSda.objects.filter(start=self.start).exists():
-            raise ValidationError({
-                'start': _(f'This start number already exists on another DID range.')
-            })
-        if self.end:
-            if VoiceSda.objects.filter(end=self.end).exists():
-                raise ValidationError({
-                    'end': _(f'This end number already exists on another DID range.')
-                })
-            VoiceValidator.check_number('end', self.end)
         VoiceValidator.check_delivery(self.delivery, self.site)
 
+        if VoiceSda.objects.filter(start=self.start).exists():
+            '''
+            check if this is an "add" or an "edit"
+            '''
+            if VoiceSda.objects.get(start=self.start).pk != self.pk:
+                raise ValidationError({
+                    'start': _(f'This start number already exists on another DID range.')
+                })
         if self.end:
+            if VoiceSda.objects.filter(end=self.end).exists():
+                '''
+                check if this is an "add" or an "edit"
+                '''
+                if VoiceSda.objects.get(start=self.start).pk != self.pk:
+                    raise ValidationError({
+                        'end': _(f'This end number already exists on another DID range.')
+                    })
+            VoiceValidator.check_number('end', self.end)
+
+            '''
+            check if self.end or self.start overwrites an existing DID range
+            '''
             for rng in VoiceSda.objects.all():
 
                 if number_quicksearch(rng.start, rng.end, str(self.start)):

@@ -7,9 +7,8 @@
 {% load tabs %}
 {% load i18n %}
 
-
 {% block breadcrumbs %}
-    {% include 'sop_voice/tools/breadcrumbs.html' with object=object.delivery name="SDA List" %}
+    {% include 'sop_voice/tools/breadcrumbs.html' with object=object name=object|meta:"verbose_name" %}
 {% endblock %}
 
 
@@ -92,7 +91,7 @@
   </div>
 
   <div class="col-md-6">
-    {% if object.delivery %}
+    {% if object.site %}
       {% include 'sop_voice/tools/site.html' with object=object maintainer=maintainer.maintainer %}
     {% endif %}
   </div>

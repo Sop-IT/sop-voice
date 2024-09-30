@@ -1,8 +1,10 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
+from django.shortcuts import get_object_or_404
 
 from netbox.views import generic
+from dcim.models import Site
 
 from ..forms.voice_sda import *
 from ..tables.voice_sda import *
@@ -18,7 +20,8 @@ __all__ = (
     'VoiceSdaBulkEditView',
     'VoiceSdaBulkDeleteView',
     'VoiceSdaListView',
-    'VoiceSdaBulkImportView'
+    'VoiceSdaBulkImportView',
+    'VoiceSdaAddSiteView'
 )
 
 
@@ -103,4 +106,28 @@ class VoiceSdaBulkImportView(generic.BulkImportView):
         if additionnal changes is needed
         '''
         response = super().post(request)
+        return response
+
+
+class VoiceSdaAddSiteView(generic.ObjectEditView):
+    '''
+    adds a site automatically to the SDA List
+    '''
+    queryset = VoiceSda.objects.all()
+    form = VoiceSdaForm
+
+    def get_object(self, **kwargs):
+        return self.queryset.model(site=get_object_or_404(Site, pk=kwargs['pk']))
+
+    def alter_object(self, obj, request, args, kwargs):
+        pk = kwargs.get('pk')
+        site = get_object_or_404(Site, pk=pk)
+        obj = self.queryset.model
+        return obj(site=site)
+
+    def get(self, request, *args, **kwargs):
+        '''
+        get request handler
+        '''
+        response = super().get(request, *args, **kwargs)
         return response
