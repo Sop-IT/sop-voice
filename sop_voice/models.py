@@ -240,26 +240,26 @@ class VoiceSda(NetBoxModel):
         VoiceDelivery,
         on_delete=models.SET_NULL,
         verbose_name=_('Delivery'),
-        blank=True,
         null=True,
+        blank=True,
     )
     site = models.ForeignKey(
         Site,
         on_delete=models.CASCADE,
         verbose_name=_('Site'),
-        null=True,
+        null=False,
         blank=True,
     )
     start = models.BigIntegerField(
         unique=False,
         verbose_name=_('Start number'),
-        null=True,
+        null=False,
         blank=True,
     )
     end = models.BigIntegerField(
         unique=False,
         verbose_name=_('End number'),
-        null=True,
+        null=False,
         blank=True,
     )
 
@@ -272,44 +272,27 @@ class VoiceSda(NetBoxModel):
     def clean(self):
         super().clean()
 
-        VoiceValidator.check_site(self.site)
-        VoiceValidator.check_number('start', self.start)
         VoiceValidator.check_delivery(self.delivery, self.site)
 
-        if VoiceSda.objects.filter(start=self.start).exists():
-            '''
-            check if this is an "add" or an "edit"
-            '''
-            if VoiceSda.objects.get(start=self.start).pk != self.pk:
-                raise ValidationError({
-                    'start': _(f'This start number already exists on another DID range.')
-                })
-        if self.end:
-            if VoiceSda.objects.filter(end=self.end).exists():
-                '''
-                check if this is an "add" or an "edit"
-                '''
-                if VoiceSda.objects.get(start=self.start).pk != self.pk:
-                    raise ValidationError({
-                        'end': _(f'This end number already exists on another DID range.')
-                    })
+        VoiceValidator.check_number('start', self.start)
+        if self.end is None:
+            self.end=self.start
+        else :
             VoiceValidator.check_number('end', self.end)
+            VoiceValidator.check_start_end(self.start, self.end)  
 
-            '''
-            check if self.end or self.start overwrites an existing DID range
-            '''
-            for rng in VoiceSda.objects.all():
-
-                if number_quicksearch(rng.start, rng.end, str(self.start)):
+        '''
+        check if self.end or self.start overlaps an existing DID range
+        '''
+        lnum=len(str(self.start))
+        for rng in VoiceSda.objects.all():
+            #only compare if numbers are comaprable (have the same length)
+            if len(str(rng.start))==lnum:
+                # check if number overlap
+                if self.start <= rng.end and rng.start <= self.end:
                     raise ValidationError({
-                        'start': _(f'This start number overwrites an existing DID range.')
+                        'start': _(f'This range {self.start} -> {self.end} overlaps range {rng.start} -> {rng.end}.')
                     })
-                if number_quicksearch(rng.start, rng.end, str(self.end)):
-                    raise ValidationError({
-                        'end': _(f'This end number overwrites an existing DID range.')
-                    })
-
-            VoiceValidator.check_start_end(self.start, self.end)
 
     def save(self, *args, **kwargs):
         if not self.end or self.end == 0:
@@ -333,8 +316,8 @@ class VoiceSda(NetBoxModel):
                 violation_error_message=_("End number must be unique.")
             ),
             models.CheckConstraint(
-                check=models.Q(end__isnull=True) | models.Q(end__gte=models.F('start')),
+                check=models.Q(end__gte=models.F('start')),
                 name='%(app_label)s_%(class)s_end_greater_than_start',
-                violation_error_message=_("End number must be greater than start number.")
+                violation_error_message=_("End number must be greater than or equal to start number.")
             )
         )
