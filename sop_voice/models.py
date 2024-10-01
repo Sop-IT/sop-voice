@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Transform
+from django.db.models.functions import math 
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
@@ -20,6 +22,9 @@ __all__ = (
     'VoiceMaintainerStatusChoice',
     'VoiceDeliveryStatusChoices',
     'SopBoolChoices',
+    'AbsoluteValue',
+    'FloorValue',
+    'LogValue'
 )
 
 
@@ -50,6 +55,27 @@ class SopBoolChoices(ChoiceSet):
         ('true', _('True'), 'green'),
         ('false', _('False'), 'red'),
     )
+
+
+class AbsoluteValue(Transform):
+    lookup_name = "abs"
+    function = "ABS"
+    bilateral = True
+
+class FloorValue(Transform):
+    lookup_name = "floor"
+    function = "FLOOR"
+    bilateral = True
+
+class LogValue(Transform):
+    lookup_name = "log"
+    function = "LOG"
+    bilateral = True
+
+models.IntegerField.register_lookup(AbsoluteValue)
+models.IntegerField.register_lookup(FloorValue)
+models.IntegerField.register_lookup(LogValue)
+
 
 
 class VoiceMaintainer(NetBoxModel):
@@ -313,7 +339,8 @@ class VoiceSda(NetBoxModel):
                 violation_error_message=_("End number must be unique.")
             ),
             models.CheckConstraint(
-                check=models.Q(end__gte=models.F('start')),
+                check=models.Q(end__gte=models.F('start')) & \
+                    models.Q(start__abs__log__floor=models.F("end")),
                 name='%(app_label)s_%(class)s_end_greater_than_start',
                 violation_error_message=_("End number must be greater than or equal to start number.")
             )
