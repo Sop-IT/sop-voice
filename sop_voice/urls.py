@@ -57,6 +57,7 @@ urlpatterns = [
     path('sda-list/journal/<int:pk>', ObjectJournalView.as_view(), name='voicesda_journal', kwargs={'model': VoiceSda}),
  
     # site voice info
+    path('site-voice-info/<int:pk>', svi.SiteVoiceInfoDetailView.as_view(), name='sitevoiceinfo_detail'),
     path('site-voice-info/edit/<int:pk>', svi.SiteVoiceInfoEditView.as_view(), name='sitevoiceinfo_edit'),
     path('site-voice-info/delete/<int:pk>', svi.SiteVoiceInfoDeleteView.as_view(), name='sitevoiceinfo_delete'),
     

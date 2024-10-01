@@ -19,7 +19,7 @@ class SiteVoiceInfoForm(forms.ModelForm):
         queryset=VoiceMaintainer.objects.all(),
         label=_('Voice Maintainer'),
         help_text=_('The voice maintainer of the site.'),
-        required=True,
+        required=False,
     )
     site = forms.ModelChoiceField(
         queryset=Site.objects.all(),

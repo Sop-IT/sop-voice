@@ -113,7 +113,7 @@ class VoiceMaintainer(NetBoxModel):
 
 
 class SiteVoiceInfo(NetBoxModel):
-    site = models.ForeignKey(
+    site = models.OneToOneField(
         Site,
         on_delete=models.CASCADE,
         verbose_name=_('Site'),
@@ -130,13 +130,18 @@ class SiteVoiceInfo(NetBoxModel):
         return f'{self.site} voice maintainer'
 
     def get_absolute_url(self) -> str:
-        if self.site:
-            return f'/dcim/sites/{self.site.pk}/voice'
-        return reverse('plugins:sop_voice:voicemaintainer_list')
+        return reverse('plugins:sop_voice:sitevoiceinfo_detail', args=[self.pk])
 
     class Meta(NetBoxModel.Meta):
         verbose_name = _('Information')
         verbose_name_plural = _('Informations')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['site',],
+                name='%(app_label)s_%(class)s_unique_site',
+                violation_error_message=_("Site must be unique.")
+            )
+        ]
 
 
 class VoiceDelivery(NetBoxModel):
@@ -146,16 +151,14 @@ class VoiceDelivery(NetBoxModel):
     provider = models.ForeignKey(
         Provider,
         on_delete=models.CASCADE,
-        related_name='voice_delivery_provider',
         verbose_name=_('Provider'),
     )
     site = models.ForeignKey(
         Site,
         on_delete=models.CASCADE,
-        related_name='voice_delivery_site',
         verbose_name=_('Site'),
     )
-    channel_count = models.BigIntegerField(
+    channel_count = models.PositiveBigIntegerField(
         verbose_name=_('Channel Count'),
         null=True,
         blank=True,
@@ -165,12 +168,12 @@ class VoiceDelivery(NetBoxModel):
         choices=VoiceDeliveryStatusChoices,
         verbose_name=_('Status'),
     )
-    ndi = models.BigIntegerField(
+    ndi = models.PositiveBigIntegerField(
         verbose_name=_('NDI'),
         null=True,
         blank=True,
     )
-    dto = models.BigIntegerField(
+    dto = models.PositiveBigIntegerField(
         verbose_name=_('DTO'),
         null=True,
         blank=True,
@@ -210,12 +213,6 @@ class VoiceDelivery(NetBoxModel):
                 raise ValidationError({
                     'ndi': _(f'This NDI already exists on another delivery.')
                 })
-        if self.dto:
-            VoiceValidator.check_number('dto', self.dto)
-            if VoiceDelivery.objects.filter(dto=self.dto).exists():
-                raise ValidationError({
-                    'dto': _(f'This DTO already exists on another delivery.')
-                })
 
 
     class Meta(NetBoxModel.Meta):
@@ -250,13 +247,13 @@ class VoiceSda(NetBoxModel):
         null=False,
         blank=True,
     )
-    start = models.BigIntegerField(
+    start = models.PositiveBigIntegerField(
         unique=False,
         verbose_name=_('Start number'),
         null=False,
         blank=True,
     )
-    end = models.BigIntegerField(
+    end = models.PositiveBigIntegerField(
         unique=False,
         verbose_name=_('End number'),
         null=False,

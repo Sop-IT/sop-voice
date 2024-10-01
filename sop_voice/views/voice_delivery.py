@@ -103,7 +103,6 @@ class VoiceDeliverySiteView(generic.ObjectEditView):
         pk = kwargs.get('pk')
         site = get_object_or_404(Site, pk=pk)
         obj = self.queryset.model
-        print(obj)
         return obj(site=site)
 
     def get(self, request, *args, **kwargs): 
