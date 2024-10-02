@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name='sop-voice',
-    version='1.2.7',
+    name='sop-phone',
+    version='0.2.1',
     packages=find_packages(),
     include_package_data=True,
     install_requires=[

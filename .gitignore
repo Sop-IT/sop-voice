@@ -5,3 +5,4 @@ dist/
 *.sh
 data.csv
 !deploy.sh
+venv/
