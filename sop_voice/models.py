@@ -145,7 +145,7 @@ class SiteVoiceInfo(NetBoxModel):
     )
     maintainer = models.ForeignKey(
         VoiceMaintainer,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         verbose_name=_('Maintainer'),
