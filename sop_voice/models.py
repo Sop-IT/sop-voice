@@ -145,7 +145,7 @@ class SiteVoiceInfo(NetBoxModel):
     )
     maintainer = models.ForeignKey(
         VoiceMaintainer,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         verbose_name=_('Maintainer'),
@@ -308,8 +308,9 @@ class VoiceSda(NetBoxModel):
         '''
         lnum=len(str(self.start))
         for rng in VoiceSda.objects.all():
-            #only compare if numbers are comaprable (have the same length)
-            if len(str(rng.start))==lnum:
+            #only compare if numbers are comparable (have the same length)
+            #also skip comparing to itself in case of modification
+            if len(str(rng.start))==lnum and (self.pk is None or self.pk != rng.pk):
                 # check if number overlap
                 if self.start <= rng.end and rng.start <= self.end:
                     raise ValidationError({
