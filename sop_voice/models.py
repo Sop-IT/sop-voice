@@ -236,7 +236,7 @@ class VoiceDelivery(NetBoxModel):
             VoiceValidator.check_number('ndi', self.ndi)
             if VoiceDelivery.objects.filter(ndi=self.ndi).exists():
                 raise ValidationError({
-                    'ndi': _(f'This NDI already exists on another delivery.')
+                    'ndi': _(f'The NDI {self.ndi} already exists on another delivery.')
                 })
 
 
