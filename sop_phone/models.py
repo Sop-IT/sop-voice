@@ -121,16 +121,19 @@ class PhoneMaintainer(PrimaryModel, ContactsMixin):
     physical_address = models.CharField(
         verbose_name=_('Physical address'),
         max_length=200,
+        null=True,
         blank=True,
         help_text=_('Physical location of the maintainer')
     )
     shipping_address = models.CharField(
         verbose_name=_('Shipping address'),
         max_length=200,
+        null=True,
         blank=True,
         help_text=_('If different from the physical address')
     )
     time_zone = TimeZoneField(
+        null=True,
         blank=True
     )
     latitude = models.DecimalField(
@@ -279,7 +282,6 @@ class PhoneDelivery(NetBoxModel):
     def __str__(self) -> str:
         delivery:str = self.delivery if hasattr(self, 'delivery') else 'Unknown delivery'
         provider:str = self.provider if hasattr(self, 'provider') else 'Unknown provider'
-
         return f'{delivery} / {provider}'
 
     def clean(self):
