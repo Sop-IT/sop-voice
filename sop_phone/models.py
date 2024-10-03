@@ -225,6 +225,8 @@ class PhoneInfo(NetBoxModel):
 class PhoneDelivery(NetBoxModel):
     delivery = models.CharField(
         verbose_name=_('Delivery'),
+        null=True,
+        blank=True,
     )
     provider = models.ForeignKey(
         Provider,
@@ -282,7 +284,7 @@ class PhoneDelivery(NetBoxModel):
 
     def clean(self):
         super().clean()
-        if self.delivery and self.site:
+        if hasattr(self, 'delivery') and self.delivery and self.site:
             if PhoneDelivery.objects.filter(site=self.site, delivery=self.delivery).exists():
                 raise ValidationError({
                     'delivery': _(f'A "{self.delivery}" delivery method already exists for this site.')
