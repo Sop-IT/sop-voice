@@ -81,6 +81,11 @@
         </tr>
 
         <tr>
+          <th scope="row">{% trans "Shipping Address" %}</th>
+          <td>{{ object.shipping_address|linebreaksbr|placeholder }}</td>
+        </tr>
+
+        <tr>
           <th scope="row">{% trans "GPS Coordinates" %}</th>
           <td class="position-relative">
             {% if object.latitude and object.longitude %}

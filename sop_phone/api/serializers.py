@@ -52,7 +52,7 @@ class PhoneMaintainerSerializer(NetBoxModelSerializer):
         model = PhoneMaintainer
         fields = (
             'id', 'url', 'slug', 'display', 'name', 'status',
-            'time_zone', 'physical_address', 'latitude', 'longitude',
+            'time_zone', 'physical_address', 'shipping_address', 'latitude', 'longitude',
             'description', 'created', 'last_updated', 'site',
         )
         brief_fields = ('id', 'url', 'slug', 'name', 'description')

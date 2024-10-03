@@ -28,5 +28,5 @@ class PhoneMaintainerTable(NetBoxTable, ContactsColumnMixin):
     class Meta(NetBoxTable.Meta):
         model = PhoneMaintainer
         fields = ('pk', 'id', 'actions', 'name', 'status', 'time_zone', 'contacts', 
-                    'physical_address', 'latitude', 'longitude', 'created', 'last_updated', 'description', 'comments', )
+                    'physical_address', 'shipping_address', 'latitude', 'longitude', 'created', 'last_updated', 'description', 'comments', )
         default_columns = ('pk', 'name', 'status', 'description',)

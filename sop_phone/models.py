@@ -85,6 +85,7 @@ models.IntegerField.register_lookup(LogValue)
 class PhoneMaintainer(PrimaryModel, ContactsMixin):
     name = models.CharField(
         verbose_name=_('Maintainer'),
+        unique=True,
     )
     slug = models.SlugField(
         verbose_name=_('slug'),
@@ -103,6 +104,12 @@ class PhoneMaintainer(PrimaryModel, ContactsMixin):
         max_length=200,
         blank=True,
         help_text=_('Physical location of the maintainer')
+    )
+    shipping_address = models.CharField(
+        verbose_name=_('Shipping address'),
+        max_length=200,
+        blank=True,
+        help_text=_('If different from the physical address')
     )
     time_zone = TimeZoneField(
         blank=True
@@ -156,11 +163,6 @@ class PhoneMaintainer(PrimaryModel, ContactsMixin):
 
     def clean(self):
         super().clean()
-
-        if self.name and PhoneMaintainer.objects.filter(name=self.name).exists():
-            raise ValidationError({
-                'name': _(f'A "{self.name}" maintainer already exists.')
-            })
 
         failprefix = ''
         crl = CheckResultList()

@@ -73,7 +73,7 @@ class PhoneMaintainerForm(NetBoxModelForm):
             name=_('Maintainer')
         ),
         FieldSet(
-            'physical_address', 'latitude', 'longitude',
+            'physical_address', 'shipping_address', 'latitude', 'longitude',
             name=_('Contact Info')
         )
     )
@@ -82,11 +82,16 @@ class PhoneMaintainerForm(NetBoxModelForm):
         model = PhoneMaintainer
         fields = (
             'name', 'slug', 'status', 'time_zone', 'description',
-            'physical_address', 'latitude', 'longitude',
+            'physical_address', 'shipping_address', 'latitude', 'longitude',
             'comments'
         )
         widgets = {
             'physical_address': forms.Textarea(
+                attrs={
+                    'rows': 3,
+                }
+            ),
+            'shipping_address': forms.Textarea(
                 attrs={
                     'rows': 3,
                 }
@@ -111,7 +116,7 @@ class PhoneMaintainerBulkImportForm(NetBoxModelImportForm):
         model = PhoneMaintainer
         fields = [
             'name', 'slug', 'status', 'time_zone', 'description',
-            'physical_address', 'latitude', 'longitude',
+            'physical_address', 'shipping_address', 'latitude', 'longitude',
             'comments'
         ]
         help_texts = {

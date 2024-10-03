@@ -67,9 +67,7 @@ class PhoneInfoDetailView(generic.ObjectView):
         context:dict = {}
         
         dids = PhoneDID.objects.filter(site=get_object_or_404(Site, pk=instance.site.id))
-        temp: tuple[int, int] = count_all_did(dids).__int__()
-        context['num_did'] = temp[0]
-        context['num_range'] = temp[1]
+        context['num_did'] = count_all_did(dids).__int__()
         return context
 
 

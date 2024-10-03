@@ -60,16 +60,16 @@ class PhoneValidator:
 class PhoneMaintainerValidator:
 
     @staticmethod
-    def check_address(status, latitude, longitude, address, crl) -> None:
+    def check_address(status, latitude, longitude, physical_address, crl) -> None:
 
         if status in ['active',]:
 
             #_________________
-            # Physical address
-            if address is None or address.strip() == "":
-                crl.append(CheckResult(LogLevelChoices.LOG_FAILURE, None, f'"{status}" Maintainers mandates an address.', "physical_address"))
-            if not re.match("^([^\n]* \r?\n)+[^\n]+$", address):
-                crl.append(CheckResult(LogLevelChoices.LOG_FAILURE, None, f'"{status}" Maintainers address must be multiline and each line must end with a space.', "physical_address"))
+            # Physical Address
+            if physical_address is None or physical_address.strip() == "":
+                crl.append(CheckResult(LogLevelChoices.LOG_FAILURE, None, f'"{status}" Maintainers mandates an physical_address.', "physical_physical_address"))
+            if not re.match("^([^\n]* \r?\n)+[^\n]+$", physical_address):
+                crl.append(CheckResult(LogLevelChoices.LOG_FAILURE, None, f'"{status}" Maintainers physical_address must be multiline and each line must end with a space.', "physical_physical_address"))
 
             #___________________________
             # Latitude / Longitude (GPS)
@@ -81,9 +81,9 @@ class PhoneMaintainerValidator:
         elif status in ['retired',]:
 
             #_________________
-            # Physical address
-            if address is not None or address.strip() != "":
-                crl.append(CheckResult(LogLevelChoices.LOG_FAILURE, None, f'"{status}" Maintainers forbids an address.', "physical_address"))
+            # Physical physical_address
+            if physical_address is not None or physical_address.strip() != "":
+                crl.append(CheckResult(LogLevelChoices.LOG_FAILURE, None, f'"{status}" Maintainers forbids an physical_address.', "physical_physical_address"))
 
             #___________________________
             # Latitude / Longitude (GPS)
@@ -91,6 +91,7 @@ class PhoneMaintainerValidator:
                 crl.append(CheckResult(LogLevelChoices.LOG_FAILURE, None, f'"{status}" Maintainers forbids latitude.', "latitude"))
             if longitude is not None:
                 crl.append(CheckResult(LogLevelChoices.LOG_FAILURE, None, f'"{status}" Maintainers forbids longitude.', "longitude"))
+
 
     @staticmethod
     def check_time_zone(status, time_zone, crl) -> None:
