@@ -209,12 +209,14 @@ class PhoneDelivery(NetBoxModel):
     )
     provider = models.ForeignKey(
         Provider,
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         verbose_name=_('Provider'),
+        null=True,
+        blank=True,
     )
     site = models.ForeignKey(
         Site,
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         verbose_name=_('Site'),
     )
     channel_count = models.PositiveBigIntegerField(
