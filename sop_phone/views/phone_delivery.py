@@ -2,7 +2,8 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.translation import gettext_lazy as _
 from django.shortcuts import get_object_or_404
 
-from utilities.views import GetRelatedModelsMixin
+from utilities.views import GetRelatedModelsMixin, register_model_view
+
 from netbox.views import generic
 from dcim.models import Site
 

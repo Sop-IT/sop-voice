@@ -1,18 +1,17 @@
-from django.contrib.auth.mixins import PermissionRequiredMixin, AccessMixin
 from django.shortcuts import render, get_object_or_404
 from django.utils.translation import gettext_lazy as _
+from django.shortcuts import redirect
 from django.views import View
 
+from utilities.views import register_model_view, ViewTab, ContentTypePermissionRequiredMixin
 from utilities.permissions import get_permission_for_model
-from utilities.views import register_model_view, ViewTab
 from netbox.views.generic.mixins import ActionsMixin
-from netbox.constants import DEFAULT_ACTION_PERMISSIONS
 from dcim.models import Site
 
 from ..tables.phone_delivery import *
 from ..tables.phone_did import *
 from ..models import *
-from ..utils import count_all_did, get_object_or_create
+from ..utils import count_all_did
 
 
 '''
@@ -26,7 +25,7 @@ __all__ = (
 
 
 @register_model_view(Site, name="phone")
-class PhoneSiteTabView(View, ActionsMixin, PermissionRequiredMixin, AccessMixin):
+class PhoneSiteTabView(View, ContentTypePermissionRequiredMixin, ActionsMixin):
     '''
     creates a "phone" tab on the site page
     '''
@@ -43,6 +42,14 @@ class PhoneSiteTabView(View, ActionsMixin, PermissionRequiredMixin, AccessMixin)
         table.configure(request)
         return table
 
+    def get_actions(self, request):
+        actions:dict = dict()
+
+        actions['DID'] = self.get_permitted_actions(request.user, PhoneDID)
+        actions['Delivery'] = self.get_permitted_actions(request.user, PhoneDelivery)
+        actions['Info'] = self.get_permitted_actions(request.user, PhoneInfo)
+        return actions
+
     def get_extra_context(self, request, pk) -> dict:
         '''
         returns all the models and tables needed for the tab
@@ -57,7 +64,7 @@ class PhoneSiteTabView(View, ActionsMixin, PermissionRequiredMixin, AccessMixin)
         context['delivery'] = PhoneDelivery
         context['delivery_table'] = self.get_table(PhoneDeliveryTable, PhoneDelivery.objects.filter(site=site), request)
         context['context'] = context
-        context['actions'] = DEFAULT_ACTION_PERMISSIONS
+        context['actions'] = self.get_actions(request)
 
         '''
         change the devices with the filter you want
@@ -67,7 +74,5 @@ class PhoneSiteTabView(View, ActionsMixin, PermissionRequiredMixin, AccessMixin)
         return {'object': site, 'context': context}
 
     def get(self, request, pk):
-        if not request.user.has_perm(get_permission_for_model(PhoneDID, 'view')):
-            return self.handle_no_permission()
         return render(request, self.template_name,
             self.get_extra_context(request, pk))

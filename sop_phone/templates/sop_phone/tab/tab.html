@@ -10,10 +10,14 @@
     add extra controls buttons
 -->
 {% block extra_controls %}
+{% if 'add' in context.actions.DID %}
     <a href="{% url 'plugins:sop_phone:phonedid_site_add' pk=object.id %}" type="button" class="btn btn-primary">
       <i class="mdi mdi-plus-thick"></i>{% trans "Add DIDs" %}</a>
+{% endif %}
+{% if 'add' in context.actions.Delivery %}
     <a href="{% url 'plugins:sop_phone:phonedelivery_site_add' pk=object.id %}" type="button" class="btn btn-primary">
       <i class="mdi mdi-plus-thick"></i>{% trans "Add phone deliveries" %}</a>
+{% endif %}
 {% endblock extra_controls %}
 
 
@@ -27,11 +31,11 @@
 
 <div class="row">
     <div class="col-md-6">
-        {% include 'sop_phone/tab/phone_info.html' with object=context.phone_info site=object %}
+        {% include 'sop_phone/tab/phone_info.html' with object=context.phone_info site=object info_actions=context.actions.Info %}
     </div>
     <div class="col-md-12">
-        {% include 'sop_phone/tools/table.html' with object=context.delivery reversed_url='plugins:sop_phone:phonedelivery_site_add' pk=object.id%}
-        {% include 'sop_phone/tools/table.html' with object=context.did reversed_url='plugins:sop_phone:phonedid_site_add' pk=object.id %}
+        {% include 'sop_phone/tools/table.html' with object=context.delivery reversed_url='plugins:sop_phone:phonedelivery_site_add' pk=object.id permi=context.actions.Delivery %}
+        {% include 'sop_phone/tools/table.html' with object=context.did reversed_url='plugins:sop_phone:phonedid_site_add' pk=object.id permi=context.actions.DID %}
     </div>
 </div>
 
