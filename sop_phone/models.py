@@ -82,6 +82,25 @@ models.IntegerField.register_lookup(FloorValue)
 models.IntegerField.register_lookup(LogValue)
 
 
+class BiAbsoluteValue(Transform):
+    lookup_name = "biabs"
+    function = "ABS"
+    bilateral = True
+
+class BiFloorValue(Transform):
+    lookup_name = "bifloor"
+    function = "FLOOR"
+    bilateral = True
+
+class BiLogValue(Transform):
+    lookup_name = "bilog"
+    function = "LOG"
+    bilateral = True
+
+models.IntegerField.register_lookup(BiAbsoluteValue)
+models.IntegerField.register_lookup(BiFloorValue)
+models.IntegerField.register_lookup(BiLogValue)
+
 class PhoneMaintainer(PrimaryModel, ContactsMixin):
     name = models.CharField(
         verbose_name=_('Maintainer'),
@@ -375,7 +394,7 @@ class PhoneDID(NetBoxModel):
             ),
             models.CheckConstraint(
                 check=models.Q(end__gte=models.F('start')) & \
-                    models.Q(start__abs__log__floor=models.F("end")),
+                    models.Q(start__biabs__bilog__bifloor=models.F("end")),
                 name='%(app_label)s_%(class)s_end_greater_than_start',
                 violation_error_message=_("End number must be greater than or equal to start number.")
             )
