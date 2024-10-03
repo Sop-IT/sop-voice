@@ -33,18 +33,15 @@ class PhoneMaintainerView(generic.ObjectView, GetRelatedModelsMixin):
 
     def count_did(self, sites) -> tuple[int, int]:
         '''
-        num_count = count of all numbers
-        range_count = count of all ranges
+        num_did = count of all numbers
         '''
-        num_count: int = 0
-        range_count: int = 0
+        num_did: int = 0
 
         for instance in sites:
             temp = count_all_did(PhoneDID.objects.filter(delivery__site=instance.site))
-            num_count += temp.__int__()[0]
-            range_count += temp.__int__()[1]
+            num_did += temp.__int__()
 
-        return num_count, range_count
+        return num_did
     
     def get_format(self, values) -> str | None:
         qs = [str(item['site__id']) for item in values]
@@ -62,10 +59,7 @@ class PhoneMaintainerView(generic.ObjectView, GetRelatedModelsMixin):
         sites = PhoneInfo.objects.filter(maintainer=instance)
         site_ids = (PhoneInfo.objects.filter(maintainer=instance).values('site__id'))
 
-        tmp: tuple[int, int] = self.count_did(sites)
-        context['num_did'] = tmp[0]
-        context['num_range'] = tmp[1]
-
+        context['num_did'] = self.count_did(sites)
         context['site_ids'] = site_ids
         context['related_models'] = self.get_related_models(
             request, 

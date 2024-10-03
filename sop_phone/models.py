@@ -4,13 +4,17 @@ from django.db.models import Transform
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+from timezone_field import TimeZoneField
+
 from netbox.models import NetBoxModel, PrimaryModel
 from netbox.models.features import ContactsMixin
 from utilities.choices import ChoiceSet
 from circuits.models import Provider
 from dcim.models import Site
 
-from .validators import PhoneValidator
+from scripts.sop_utils import CheckResultList, ValidatorCheckResultLogger
+
+from .validators import PhoneValidator, PhoneMaintainerValidator
 
 
 
@@ -94,6 +98,31 @@ class PhoneMaintainer(PrimaryModel, ContactsMixin):
         default="Unknown",
         verbose_name=_('Status')
     )
+    physical_address = models.CharField(
+        verbose_name=_('Physical address'),
+        max_length=200,
+        blank=True,
+        help_text=_('Physical location of the maintainer')
+    )
+    time_zone = TimeZoneField(
+        blank=True
+    )
+    latitude = models.DecimalField(
+        verbose_name=_('Latitude'),
+        max_digits=8,
+        decimal_places=6,
+        blank=True,
+        null=True,
+        help_text=_('GPS coordinate in decimal format (xx.yyyyyy)')
+    )
+    longitude = models.DecimalField(
+        verbose_name=_('Longitude'),
+        max_digits=9,
+        decimal_places=6,
+        blank=True,
+        null=True,
+        help_text=_('GPS coordinate in decimal format (xx.yyyyyy)')
+    )
 
     def __str__(self) -> str:
         return f'{self.name}'
@@ -120,13 +149,24 @@ class PhoneMaintainer(PrimaryModel, ContactsMixin):
             )
         )
 
+    def fail(self, message, field=None):
+        if field is not None:
+            raise ValidationError({field: message})
+        raise ValidationError(message)
+
     def clean(self):
         super().clean()
-        
+
         if self.name and PhoneMaintainer.objects.filter(name=self.name).exists():
             raise ValidationError({
                 'name': _(f'A "{self.name}" maintainer already exists.')
             })
+
+        failprefix = ''
+        crl = CheckResultList()
+        PhoneMaintainerValidator.check_time_zone(self.status, self.time_zone, crl)
+        PhoneMaintainerValidator.check_address(self.status, self.latitude, self.longitude, self.physical_address, crl)
+        crl.dump_to(ValidatorCheckResultLogger(self, failprefix))
 
 
 class PhoneInfo(NetBoxModel):

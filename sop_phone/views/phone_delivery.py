@@ -55,7 +55,6 @@ class PhoneDeliveryDetailView(generic.ObjectView, PermissionRequiredMixin, GetRe
         context: dict = {}
 
         did = PhoneDID.objects.filter(delivery=instance)
-        temp: tuple[int, int] = count_all_did(did).__int__()
 
         try:
             site_info = PhoneInfo.objects.filter(site=instance.site.id)
@@ -66,8 +65,7 @@ class PhoneDeliveryDetailView(generic.ObjectView, PermissionRequiredMixin, GetRe
         if instance.dto:
             context['dto'] = format_number(instance.dto)
         context['did_range'] = PhoneDID
-        context['num_did'] = temp[0]
-        context['num_range'] = temp[1]
+        context['num_did'] = count_all_did(did).__int__()
         context['related_models'] = self.get_related_models(
             request, instance,
         )

@@ -81,7 +81,7 @@ class PhoneDIDDetailView(generic.ObjectView, PermissionRequiredMixin):
         try:
             context['start'] = format_number(instance.start)
             context['end'] = format_number(instance.end)
-            context['num_did'] = count_all_did(instance).__int__()[0]
+            context['num_did'] = count_all_did(instance).__int__()
             context['maintainer'] = PhoneInfo.objects.filter(site=instance.delivery.site).first()
         except:pass
         return context

@@ -54,9 +54,9 @@
         </tr>
 
         <tr>
-          <th scope="row">{% trans "DID range maintained" %}</th>
+          <th scope="row">{% trans "Phone numbers maintained" %}</th>
             <td>
-              {{num_range}} {% trans "ranges "%}({{num_did}} {% trans "numbers" %})
+              {{num_did}} number(s)
             </td>
         </tr>
 
@@ -69,30 +69,6 @@
       {% include 'sop_phone/tools/site.html' with object=object maintainer=maintainer.maintainer %}
     {% endif %}
   </div>
-
-  {% if object.maintainer %}
-  <div class="col col-md-12">
-    <div class="card">
-
-      <h2 class="card-header">
-        <a href="{% url object.maintainer|viewname:"detail" pk=object.maintainer.pk %}/contacts/">Contacts</a>
-        <div class="card-actions">
-          <a href="{% url 'tenancy:contactassignment_add' %}?object_type={{ object.maintainer|content_type_id }}&object_id={{ object.maintainer.pk }}" class="btn btn-ghost-primary btn-sm">
-            <i class="mdi mdi-plus-thick" aria-hidden="true"></i> {% trans "Add a contact" %}
-          </a>
-        </div>
-      </h2>
-    
-      <div class="htmx-container table-responsive"
-        hx-get="{% url "plugins:sop_phone:phonemaintainer_contacts" pk=object.maintainer.pk %}"
-        hx-target="this"
-        hx-trigger="load" hx-select=".htmx-container" hx-swap="outerHTML"
-      ></div>
-
-    </div>
-  </div>
-  {% endif %}
-
 
 </div>
 {% endblock content %}

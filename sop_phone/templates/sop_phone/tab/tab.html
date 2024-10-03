@@ -30,8 +30,8 @@
         {% include 'sop_phone/tab/phone_info.html' with object=context.phone_info site=object %}
     </div>
     <div class="col-md-12">
-        {% include 'sop_phone/tools/table.html' with object=context.delivery reversed_url='plugins:sop_phone:phonedelivery_add' pk=object.id%}
-        {% include 'sop_phone/tools/table.html' with object=context.did reversed_url='plugins:sop_phone:phonedid_add' pk=object.id %}
+        {% include 'sop_phone/tools/table.html' with object=context.delivery reversed_url='plugins:sop_phone:phonedelivery_site_add' pk=object.id%}
+        {% include 'sop_phone/tools/table.html' with object=context.did reversed_url='plugins:sop_phone:phonedid_site_add' pk=object.id %}
     </div>
 </div>
 

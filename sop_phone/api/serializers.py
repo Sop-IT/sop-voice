@@ -2,6 +2,8 @@ from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from timezone_field.rest_framework import TimeZoneSerializerField
+
 from netbox.api.fields import ChoiceField
 from netbox.api.serializers import NetBoxModelSerializer
 from dcim.api.serializers import SiteSerializer
@@ -44,12 +46,14 @@ class PhoneMaintainerSerializer(NetBoxModelSerializer):
         choices=PhoneMaintainerStatusChoice
     )
     site = serializers.SerializerMethodField()
+    time_zone = TimeZoneSerializerField(required=False, allow_null=True)
 
     class Meta:
         model = PhoneMaintainer
         fields = (
-            'id', 'url', 'slug', 'display', 'name', 'status', 'description', 'created', 'last_updated',
-            'site',
+            'id', 'url', 'slug', 'display', 'name', 'status',
+            'time_zone', 'physical_address', 'latitude', 'longitude',
+            'description', 'created', 'last_updated', 'site',
         )
         brief_fields = ('id', 'url', 'slug', 'name', 'description')
 

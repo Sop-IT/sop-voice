@@ -57,13 +57,13 @@ class count_all_did:
         PhoneDID (instance)
     Returns:
 ```python
-    __int__():
-        return (self.phone_count, self.range_count)
+    __int__(self):
+        return self.phone_coun)
 ```
     """
     def __init__(self, phone_did) -> None:
         self.phone_did = phone_did
-        self.phone_count, self.range_count = self.count()
+        self.phone_count = self.count()
 
     def count_range(self, start: int, end: int) -> int:
         '''
@@ -79,25 +79,22 @@ class count_all_did:
             return (end - start) + 1
         return 0
 
-    def count(self) -> tuple[int, int]:
-        range_count: int = 0
+    def count(self) -> int:
         phone_count: int = 0
 
         try:
             for did in self.phone_did:
-                range_count += 1
                 phone_count += self.count_range(did.start, did.end)
         except:
             try:
                 phone_count += self.count_range(self.phone_did.start, self.phone_did.end)
-                range_count += 1
             except:pass
-        return phone_count, range_count
+        return phone_count
 
-    def __int__(self) -> tuple[int, int]:
+    def __int__(self) -> int:
         '''
         ```python
-        return (self.phone_count, self.range_count)
+        return self.phone_count
         ```
         '''
-        return (self.phone_count, self.range_count)
+        return self.phone_count

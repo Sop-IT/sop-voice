@@ -1,6 +1,9 @@
 {% extends "generic/object.html" %}
 {% load helpers %}
+{% load plugins %}
+{% load tz %}
 {% load i18n %}
+{% load l10n %}
 
 
 {% block breadcrumbs %}
@@ -42,10 +45,62 @@
         <tr>
           <th scope="row">{% trans "Phone numbers maintained" %}</th>
             <td>
-              {{num_range}} range(s) - {{num_did}} number(s)
+              {{num_did}} number(s)
             </td>
         </tr>
 
+<!--_______________________________________________
+    litterally like /dcim/site.html NetBox template
+    -->
+        <tr>
+          <th scope="row">{% trans "Time Zone" %}</th>
+          <td>
+            {% if object.time_zone %}
+              {{ object.time_zone }} ({% trans "UTC" %} {{ object.time_zone|tzoffset }})<br />
+              <small class="text-muted">{% trans "Site time" %}: {% timezone object.time_zone %}{% now 'Y-m-d H:i' %}{% endtimezone %}</small>
+            {% else %}
+              {{ ''|placeholder }}
+            {% endif %}
+          </td>
+        </tr>
+
+        <tr>
+          <th scope="row">{% trans "Physical Address" %}</th>
+          <td class="d-flex justify-content-between align-items-start">
+            {% if object.physical_address %}
+              <span>{{ object.physical_address|linebreaksbr }}</span>
+              {% if config.MAPS_URL %}
+                <a href="{{ config.MAPS_URL }}{{ object.physical_address|urlencode }}" target="_blank" class="btn btn-primary btn-sm d-print-none">
+                  <i class="mdi mdi-map-marker"></i> {% trans "Map" %}
+                </a>
+              {% endif %}
+            {% else %}
+              {{ ''|placeholder }}
+            {% endif %}
+          </td>
+        </tr>
+
+        <tr>
+          <th scope="row">{% trans "GPS Coordinates" %}</th>
+          <td class="position-relative">
+            {% if object.latitude and object.longitude %}
+              {% if config.MAPS_URL %}
+                <div class="position-absolute top-50 end-0 me-2 translate-middle-y d-print-none">
+                  <a href="{{ config.MAPS_URL }}{{ object.latitude|unlocalize }},{{ object.longitude|unlocalize }}" target="_blank" class="btn btn-primary btn-sm">
+                    <i class="mdi mdi-map-marker"></i> {% trans "Map" %}
+                  </a>
+                </div>
+                {% endif %}
+              <span>{{ object.latitude }}, {{ object.longitude }}</span>
+            {% else %}
+              {{ ''|placeholder }}
+            {% endif %}
+          </td>
+        </tr>
+<!--_______________________________________________
+-->
+
+        
       </table>
     </div>
     

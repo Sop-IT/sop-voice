@@ -1,8 +1,18 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from django.utils.safestring import mark_safe
 
-from utilities.forms.fields import CommentField, SlugField, CSVChoiceField
-from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm, NetBoxModelBulkEditForm, NetBoxModelImportForm
+from timezone_field import TimeZoneFormField
+
+from utilities.forms import add_blank_choice
+from utilities.forms.fields import (
+    CommentField, SlugField, CSVChoiceField
+)
+from utilities.forms.rendering import FieldSet
+from netbox.forms import (
+    NetBoxModelFilterSetForm, NetBoxModelForm, NetBoxModelBulkEditForm,
+    NetBoxModelImportForm
+)
 
 from ..models import *
 
@@ -50,12 +60,38 @@ class PhoneMaintainerForm(NetBoxModelForm):
         choices=PhoneMaintainerStatusChoice,
         required=True
     )
+    time_zone = TimeZoneFormField(
+        label=_('Time zone'),
+        choices=add_blank_choice(TimeZoneFormField().choices),
+        required=False
+    )
     comments = CommentField()
+
+    fieldsets = (
+        FieldSet(
+            'name', 'slug', 'status', 'time_zone', 'description',
+            name=_('Maintainer')
+        ),
+        FieldSet(
+            'physical_address', 'latitude', 'longitude',
+            name=_('Contact Info')
+        )
+    )
 
     class Meta:
         model = PhoneMaintainer
-        fields = ('name', 'slug', 'status', 'description', 'comments')
-
+        fields = (
+            'name', 'slug', 'status', 'time_zone', 'description',
+            'physical_address', 'latitude', 'longitude',
+            'comments'
+        )
+        widgets = {
+            'physical_address': forms.Textarea(
+                attrs={
+                    'rows': 3,
+                }
+            ),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -73,7 +109,18 @@ class PhoneMaintainerBulkImportForm(NetBoxModelImportForm):
 
     class Meta:
         model = PhoneMaintainer
-        fields = ['name', 'slug', 'status', 'description',]
+        fields = [
+            'name', 'slug', 'status', 'time_zone', 'description',
+            'physical_address', 'latitude', 'longitude',
+            'comments'
+        ]
+        help_texts = {
+            'time_zone': mark_safe(
+                '{} (<a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">{}</a>)'.format(
+                    _('Time zone'), _('available options')
+                )
+            )
+        }
 
     def clean(self):
         super().clean()
