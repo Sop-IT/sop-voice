@@ -187,10 +187,11 @@ class PhoneMaintainer(PrimaryModel, ContactsMixin):
         super().clean()
 
         failprefix = ''
-        crl = CheckResultList()
-        PhoneMaintainerValidator.check_time_zone(self.status, self.time_zone, crl)
-        PhoneMaintainerValidator.check_address(self.status, self.latitude, self.longitude, self.physical_address, crl)
-        crl.dump_to(ValidatorCheckResultLogger(self, failprefix))
+        # NOK A REVOIR
+        # crl = CheckResultList()
+        #PhoneMaintainerValidator.check_time_zone(self.status, self.time_zone, crl)
+        #PhoneMaintainerValidator.check_address(self.status, self.latitude, self.longitude, self.physical_address, crl)
+        #crl.dump_to(ValidatorCheckResultLogger(self, failprefix))
 
 
 class PhoneInfo(NetBoxModel):
