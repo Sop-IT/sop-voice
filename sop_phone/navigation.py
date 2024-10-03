@@ -13,25 +13,6 @@ PHONE = Menu(
             label=_('Phone'),
             items=(
                 MenuItem(
-                    link=f'plugins:sop_phone:phonemaintainer_list',
-                    link_text=_('Maintainers'),
-                    permissions=[f'sop_phone.view_phonemaintainer'],
-                    buttons=(
-                        MenuItemButton(
-                            link=f'plugins:sop_phone:phonemaintainer_add',
-                            title='Add',
-                            icon_class='mdi mdi-plus-thick',
-                            permissions=[f'sop_phone.add_phonemaintainer'],
-                        ),
-                        MenuItemButton(
-                            link=f'plugins:sop_phone:phonemaintainer_import',
-                            title='Import',
-                            icon_class='mdi mdi-upload',
-                            permissions=[f'sop_phone.add_phonemaintainer'],
-                        ),
-                    ),
-                ),
-                MenuItem(
                     link=f'plugins:sop_phone:phoneinfo_list',
                     link_text=_('Informations'),
                     permissions=[f'sop_phone.view_phoneinfo'],
@@ -41,6 +22,19 @@ PHONE = Menu(
                             title='Add',
                             icon_class='mdi mdi-plus-thick',
                             permissions=[f'sop_phone.add_phoneinfo'],
+                        ),
+                    ),
+                ),
+                MenuItem(
+                    link=f'plugins:sop_phone:phonedelivery_list',
+                    link_text=_('Deliveries'),
+                    permissions=[f'sop_phone.view_phonedelivery'],
+                    buttons=(
+                        MenuItemButton(
+                            link=f'plugins:sop_phone:phonedelivery_add',
+                            title='Add',
+                            icon_class='mdi mdi-plus-thick',
+                            permissions=[f'sop_phone.add_phonedelivery'],
                         ),
                     ),
                 ),
@@ -64,15 +58,21 @@ PHONE = Menu(
                     ),
                 ),
                 MenuItem(
-                    link=f'plugins:sop_phone:phonedelivery_list',
-                    link_text=_('Deliveries'),
-                    permissions=[f'sop_phone.view_phonedelivery'],
+                    link=f'plugins:sop_phone:phonemaintainer_list',
+                    link_text=_('Maintainers'),
+                    permissions=[f'sop_phone.view_phonemaintainer'],
                     buttons=(
                         MenuItemButton(
-                            link=f'plugins:sop_phone:phonedelivery_add',
+                            link=f'plugins:sop_phone:phonemaintainer_add',
                             title='Add',
                             icon_class='mdi mdi-plus-thick',
-                            permissions=[f'sop_phone.add_phonedelivery'],
+                            permissions=[f'sop_phone.add_phonemaintainer'],
+                        ),
+                        MenuItemButton(
+                            link=f'plugins:sop_phone:phonemaintainer_import',
+                            title='Import',
+                            icon_class='mdi mdi-upload',
+                            permissions=[f'sop_phone.add_phonemaintainer'],
                         ),
                     ),
                 ),
