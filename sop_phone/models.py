@@ -12,8 +12,6 @@ from utilities.choices import ChoiceSet
 from circuits.models import Provider
 from dcim.models import Site
 
-from scripts.sop_utils import CheckResultList, ValidatorCheckResultLogger
-
 from .validators import PhoneValidator, PhoneMaintainerValidator
 
 
@@ -185,14 +183,11 @@ class PhoneMaintainer(PrimaryModel, ContactsMixin):
 
     def clean(self):
         super().clean()
-
-        failprefix = ''
-        # NOK A REVOIR
-        # crl = CheckResultList()
-        #PhoneMaintainerValidator.check_time_zone(self.status, self.time_zone, crl)
-        #PhoneMaintainerValidator.check_address(self.status, self.latitude, self.longitude, self.physical_address, crl)
-        #crl.dump_to(ValidatorCheckResultLogger(self, failprefix))
-
+        if self.physical_address:
+            PhoneMaintainerValidator.check_address(self.physical_address, 'physical_address')
+        if self.shipping_address:
+            PhoneMaintainerValidator.check_address(self.shipping_address, 'shipping_address')
+ 
 
 class PhoneInfo(NetBoxModel):
     site = models.OneToOneField(
