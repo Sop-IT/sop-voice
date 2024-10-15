@@ -23,6 +23,9 @@ class PhoneDIDBulkEditForm(NetBoxModelBulkEditForm):
     site = DynamicModelChoiceField(
         queryset=Site.objects.all()
     )
+    # this field depends on the site field
+    # -> you can only enter deliveries that 
+    # -> share the same site as the field site   
     delivery = DynamicModelChoiceField(
         queryset=PhoneDelivery.objects.all(),
         help_text=_('Specify how this range is delivered.'),
@@ -99,6 +102,9 @@ class PhoneDIDForm(NetBoxModelForm):
         required=False,
         help_text=_('E164 format - can be left blank if the range is only one number. / NUMBER ONLY'),
     )
+    # this field depends on the site field
+    # -> you can only enter deliveries that 
+    # -> share the same site as the field site
     delivery = DynamicModelChoiceField(
         label=_('Delivery'),
         queryset=PhoneDelivery.objects.all(),

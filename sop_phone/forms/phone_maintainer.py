@@ -54,7 +54,7 @@ class PhoneMaintainerBulkEditForm(NetBoxModelBulkEditForm):
 
 
 class PhoneMaintainerForm(NetBoxModelForm):
-    name = forms.CharField(label=_('Maintainer'))
+    name = forms.CharField(label=_('Name'))
     slug = SlugField()
     status = forms.ChoiceField(
         choices=PhoneMaintainerStatusChoice,

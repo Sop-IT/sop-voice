@@ -69,23 +69,26 @@ class PhoneValidator:
 
 def number_quicksearch(start: int, end: int, pattern: str) -> bool:
     '''
-    Recherche rapide d'un nombre dans une plage donnée
+    number quicksearch with pattern in range of start>>end
     '''
     pattern_len = len(pattern)
     pattern_int = int(pattern)
-    divisor = 10 ** pattern_len
 
-    if start % divisor == pattern_int or end % divisor == pattern_int:
-        return True
+    # calculate the largest multiple of 10^len(pattern) <= start
+    base = start - (start % 10 ** pattern_len)
 
-    current = start
-    while current <= end:
-        temp = current
-        while temp > 0:
-            if temp % divisor == pattern_int:
-                return True
-            temp //= 10
-        current += 1
+    while base <= end:
+        # check if the base + pattern is in the range
+        if base + pattern_int >= start and base + pattern_int <= end:
+            return True
+
+        # move to the next block
+        base += 10 ** pattern_len 
+
+        # if the pattern search is impossible because base is too big
+        # break the loop and return false
+        if base > end - pattern_int:
+            break
 
     return False
 
