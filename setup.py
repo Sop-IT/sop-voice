@@ -3,13 +3,13 @@ from setuptools import setup, find_packages
 
 setup(
     name='sop-phone',
-    version='0.3.0',
+    version='0.3.1',
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
         'phonenumbers'
     ],
-    description="Manage voice informations of each sites.",
+    description="Manage phone informations of each sites.",
     author="Leorevoir",
     author_email="leo.quinzler@epitech.eu",
     classifiers=[
