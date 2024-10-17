@@ -133,7 +133,7 @@ class PhoneDeliverySerializer(NetBoxModelSerializer):
     class Meta:
         model = PhoneDelivery
         fields = ('id', 'url', 'display', 'site', 'delivery', 'provider',
-            'channel_count', 'status',
+            'channel_count', 'status', 'ndi', 'dto',
         )
         brief_fields = ('id', 'url', 'display', 'provider', 'delivery',)
 
