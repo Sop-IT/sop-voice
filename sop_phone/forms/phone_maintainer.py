@@ -5,14 +5,16 @@ from django.utils.safestring import mark_safe
 from timezone_field import TimeZoneFormField
 
 from utilities.forms import add_blank_choice
+from tenancy.forms import ContactModelFilterForm
 from utilities.forms.fields import (
-    CommentField, SlugField, CSVChoiceField
+    CommentField, SlugField, CSVChoiceField, DynamicModelChoiceField
 )
 from utilities.forms.rendering import FieldSet
 from netbox.forms import (
     NetBoxModelFilterSetForm, NetBoxModelForm, NetBoxModelBulkEditForm,
     NetBoxModelImportForm
 )
+from dcim.models import Site, Region, SiteGroup
 
 from ..models import *
 
@@ -25,17 +27,52 @@ __all__ = (
 )
 
 
-class PhoneMaintainerFilterForm(NetBoxModelFilterSetForm):
+class PhoneMaintainerFilterForm(NetBoxModelFilterSetForm, ContactModelFilterForm):
     model = PhoneMaintainer
+
+    site_id = DynamicModelChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        label=_('Site')
+    )
+    region_id = DynamicModelChoiceField(
+        queryset=Region.objects.all(),
+        required=False,
+        label=_('Region')
+    )
+    group_id = DynamicModelChoiceField(
+        queryset=SiteGroup.objects.all(),
+        required=False,
+        label=_('Site group')
+    )
     status = forms.ChoiceField(
-        choices=PhoneMaintainerStatusChoice,
+        choices=add_blank_choice(PhoneMaintainerStatusChoice),
+        initial=None,
         required=False,
         label=_('Status'),
     )
 
+    fieldsets = (
+        FieldSet(
+            'region_id', 'group_id', 'site_id',
+            name=_('Location')
+        ),
+        FieldSet(
+            'contact', 'contact_role', 'contact_group',
+            name=_('Contacts')
+        ),
+        FieldSet(
+            'name', 'slug', 'status',
+            name=_('Attributes')
+        )
+    )
+    
+
+
 
 class PhoneMaintainerBulkEditForm(NetBoxModelBulkEditForm):
     model = PhoneMaintainer
+
     status = forms.ChoiceField(
         choices=PhoneMaintainerStatusChoice,
         required=True,

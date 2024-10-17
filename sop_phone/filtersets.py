@@ -2,8 +2,10 @@ import django_filters
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _ 
 
+from dcim.models import Site, Region, SiteGroup
 from netbox.filtersets import NetBoxModelFilterSet
-from dcim.models import Site
+from utilities.filters import MultiValueCharFilter
+from tenancy.filtersets import  ContactModelFilterSet
 
 from .models import *
 from .validators import number_quicksearch
@@ -33,6 +35,16 @@ class PhoneDeliveryFilterSet(NetBoxModelFilterSet):
     site_name = django_filters.CharFilter(
         field_name='site__name',
         label=_('Site (name)')
+    )
+    region_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Region.objects.all(),
+        field_name='site__region',
+        label=_('Region (ID)')
+    )
+    group_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=SiteGroup.objects.all(),
+        field_name='site__group',
+        label=_('Site group (ID)')
     )
     maintainer_id = django_filters.ModelMultipleChoiceFilter(
         queryset=PhoneMaintainer.objects.all(),
@@ -71,6 +83,7 @@ class PhoneDeliveryFilterSet(NetBoxModelFilterSet):
         return queryset.filter(
             Q(delivery__icontains=value) |
             Q(provider__name__icontains=value) |
+            Q(channel_count__icontains=value) |
             Q(dto__icontains=value) |
             Q(ndi__icontains=value)
         )
@@ -91,6 +104,16 @@ class PhoneInfoFilterSet(NetBoxModelFilterSet):
         field_name='site__name',
         label=_('Site (name)')
     )
+    region_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Region.objects.all(),
+        field_name='site__region',
+        label=_('Region (ID)')
+    )
+    group_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=SiteGroup.objects.all(),
+        field_name='site__group',
+        label=_('Site group (ID)')
+    )
     maintainer_id = django_filters.ModelMultipleChoiceFilter(
         queryset=PhoneMaintainer.objects.all(),
         field_name='maintainer',
@@ -103,18 +126,26 @@ class PhoneInfoFilterSet(NetBoxModelFilterSet):
 
     class Meta:
         model = PhoneInfo
-        fields = ('id', 'site', 'site_id', 'site_name', 'maintainer',)
+        fields = ('id', 'site', 'site_id', 'site_name', 'maintainer_id', 'maintainer_name',)
 
     def search_site_id(self, queryset, name, value):
         if not value:
             return queryset
         return queryset.filter(site__in=value)
 
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        return queryset.filter(
+            Q(maintainer__icontains=value) |
+            Q(site__icontains=value)
+        )
+
 
 #_________________________
 # Maintainers filter
 
-class PhoneMaintainerFilterSet(NetBoxModelFilterSet):
+class PhoneMaintainerFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=PhoneMaintainerStatusChoice,
         null_value=None
@@ -128,10 +159,39 @@ class PhoneMaintainerFilterSet(NetBoxModelFilterSet):
         method='search_site_id',
         label=_('Site (ID)')
     )
+    region_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Region.objects.all(),
+        method='search_region_id',
+        label=_('Region (ID)')
+    )
+    group_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=SiteGroup.objects.all(),
+        method='search_group_id',
+        label=_('Site group (ID)')
+    )
+    time_zone = MultiValueCharFilter()
 
     class Meta:
         model = PhoneMaintainer
-        fields = ('id', 'name', 'status')
+        fields = ('id', 'name', 'slug', 'status', 'latitude', 'longitude', 'description')
+
+    def search_region_id(self, queryset, name, value):
+        if not value:
+            return queryset
+        try:
+            site = Site.objects.filter(region__in=value)
+            maintainer_id = PhoneInfo.objects.filter(site__in=site).values_list('maintainer_id', flat=True)
+            return queryset.filter(pk__in=maintainer_id)
+        except:return queryset
+
+    def search_group_id(self, queryset, name, value):
+        if not value:
+            return queryset
+        try:
+            site = Site.objects.filter(group__in=value)
+            maintainer_id = PhoneInfo.objects.filter(site__in=site).values_list('maintainer_id', flat=True)
+            return queryset.filter(pk__in=maintainer_id)
+        except:return queryset
 
     def search_site_name(self, queryset, name, value):
         if not value:
@@ -153,7 +213,12 @@ class PhoneMaintainerFilterSet(NetBoxModelFilterSet):
         if not value.strip():
             return queryset
         return queryset.filter(
-            Q(name__icontains=value)
+            Q(name__icontains=value) |
+            Q(slug__icontains=value) |
+            Q(physical_address__icontains=value) |
+            Q(shipping_address__icontains=value) |
+            Q(description__icontains=value) |
+            Q(comments__icontains=value)
         )
 
 
@@ -186,8 +251,18 @@ class PhoneDIDFilterSet(NetBoxModelFilterSet):
         label=_('Delivery (ID)')
     )
     partial_number = django_filters.NumberFilter(
-        label=_('Partial number'),
-        method='search_partial_number'
+        method='search_partial_number',
+        label=_('Partial number')
+    )
+    region_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Region.objects.all(),
+        field_name='site__region',
+        label=_('Region')
+    )
+    group_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=SiteGroup.objects.all(),
+        field_name='site__group',
+        label=_('Site group')
     )
 
     class Meta:

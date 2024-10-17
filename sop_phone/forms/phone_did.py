@@ -4,7 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelForm, NetBoxModelImportForm
 from utilities.forms.fields import DynamicModelChoiceField, DynamicModelChoiceField, CSVModelChoiceField
-from dcim.models import Site
+from utilities.forms.rendering import FieldSet
+from dcim.models import Site, Region, SiteGroup
 
 from ..models import *
 
@@ -53,6 +54,16 @@ class PhoneDIDFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label=_('Site')
     )
+    group_id = DynamicModelChoiceField(
+        queryset=SiteGroup.objects.all(),
+        required=False,
+        label=_('Site group')
+    )
+    region_id = DynamicModelChoiceField(
+        queryset=Region.objects.all(),
+        required=False,
+        label=_('Region')
+    )
     maintainer_id = forms.ModelChoiceField(
         queryset=PhoneMaintainer.objects.all(),
         required=False,
@@ -65,7 +76,8 @@ class PhoneDIDFilterForm(NetBoxModelFilterSetForm):
     )
     partial_number = forms.IntegerField(
         label=_('Partial number'),
-        required=False
+        required=False,
+        help_text=_('E164 format')
     )
     start = forms.IntegerField(
         label=_('Start number'),
@@ -78,11 +90,23 @@ class PhoneDIDFilterForm(NetBoxModelFilterSetForm):
         help_text=_('E164 format')
     )
 
+    fieldsets = (
+        FieldSet(
+            'region_id', 'group_id', 'site_id',
+            name=_('Location')
+        ),
+        FieldSet(
+            'maintainer_id', 'delivery_id',
+            name=_('Information')
+        ),
+        FieldSet(
+            'partial_number', 'start', 'end',
+            name=_('Attributes')
+        )
+    )
+
     def clean(self):
         super().clean()
-        if self.cleaned_data and self.cleaned_data['partial_number']:
-            if not isinstance(self.cleaned_data.get('partial_number'), int):
-                raise ValidationError({'partial_number': _('Partial number must be a number')})
 
 
 class PhoneDIDForm(NetBoxModelForm):
@@ -113,6 +137,16 @@ class PhoneDIDForm(NetBoxModelForm):
         query_params={
             'site_id': '$site'
         }
+    )
+    fieldsets = (
+        FieldSet(
+            'site',
+            name=_('Location')
+        ),
+        FieldSet(
+            'start', 'end', 'delivery',
+            name=_('DIDs')
+        )
     )
 
     class Meta:

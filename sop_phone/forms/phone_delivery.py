@@ -1,11 +1,13 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from dcim.models import Site
 from circuits.models import Provider
+from utilities.forms import add_blank_choice
 from utilities.forms.fields import SlugField
+from dcim.models import Site, Region, SiteGroup
 from utilities.forms.fields import DynamicModelChoiceField, CommentField
 from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm, NetBoxModelBulkEditForm
+from utilities.forms.rendering import FieldSet
 
 from ..models import *
 
@@ -25,19 +27,66 @@ class PhoneDeliveryFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label=_('Site')
     )
+    group_id = DynamicModelChoiceField(
+        queryset=SiteGroup.objects.all(),
+        required=False,
+        label=_('Site group')
+    )
+    region_id = DynamicModelChoiceField(
+        queryset=Region.objects.all(),
+        required=False,
+        label=_('Region')
+    )
+    maintainer_id = DynamicModelChoiceField(
+        queryset=PhoneMaintainer.objects.all(),
+        required=False,
+        label=_('Maintainer')
+    )
     delivery_id = forms.CharField(
         label=_('Delivery Method'),
         required=False
     )
     provider = forms.ModelChoiceField(
-        required=False,
         queryset=Provider.objects.all(),
+        required=False,
         label=_('Provider')
     )
-    status = forms.ChoiceField(
-        choices=PhoneDeliveryStatusChoices,
+    status = forms.MultipleChoiceField(
+        choices=add_blank_choice(PhoneDeliveryStatusChoices),
+        initial=None,
         required=False,
         label=_('Status')
+    )
+    channel_count = forms.IntegerField(
+        required=False,
+        label=_('Channel count'),
+        help_text=_('G.711 cidec - 96kbps reserved bandwidth per channel / NUMBER ONLY')
+    )
+    ndi = forms.IntegerField(
+        required=False,
+        label=_('MBN / NDI'),
+        help_text=_("Main Billing Number / Numéro de Désignation d'Installation - E164 format / NUMBER ONLY")
+    )
+    dto = forms.IntegerField(
+        required=False,
+        label=_('DTO'),
+        help_text=_('E164 format / NUMBER ONLY')
+    )
+
+    fieldsets = (
+        FieldSet(
+            'region_id', 'group_id', 'site_id',
+            name=_('Location')
+        ),
+        FieldSet(
+            'maintainer_id',
+            name=_('Information')
+        ),
+        FieldSet(
+            'delivery_id', 'provider', 'status',
+            'channel_count', 'ndi', 'dto',
+            name=_('Attributes')
+        )
     )
 
 
@@ -98,7 +147,7 @@ class PhoneDeliveryForm(NetBoxModelForm):
     channel_count = forms.IntegerField(
         required=False,
         label=_('Channel Count'),
-        help_text=_('G.711 cidec - 96kbps reserved bandwidth per channel')
+        help_text=_('G.711 cidec - 96kbps reserved bandwidth per channel / NUMBER ONLY')
     )
     status = forms.ChoiceField(
         choices=PhoneDeliveryStatusChoices,
@@ -116,6 +165,17 @@ class PhoneDeliveryForm(NetBoxModelForm):
         help_text=_('E164 format / NUMBER ONLY')
     )
     comments = CommentField()
+
+    fieldsets = (
+        FieldSet(
+            'delivery', 'provider', 'status', 'channel_count', 'ndi', 'dto',
+            name=_('Delivery')
+        ),
+        FieldSet(
+            'site',
+            name=_('Location')
+        )
+    )
 
     class Meta:
         model = PhoneDelivery

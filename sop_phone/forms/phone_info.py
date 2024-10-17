@@ -3,7 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelForm, NetBoxModelFilterSetForm
 from utilities.forms.fields import DynamicModelChoiceField
-from dcim.models import Site
+from utilities.forms.rendering import FieldSet
+from dcim.models import Site, Region, SiteGroup
 
 from ..models import PhoneInfo, PhoneMaintainer
 
@@ -22,10 +23,31 @@ class PhoneInfoFilterForm(NetBoxModelFilterSetForm):
         required=False,
         label=_('Site')
     )
-    maintainer_id = DynamicModelChoiceField(
+    region_id = DynamicModelChoiceField(
+        queryset=Region.objects.all(),
+        required=False,
+        label=_('Region')
+    )
+    group_id = DynamicModelChoiceField(
+        queryset=SiteGroup.objects.all(),
+        required=False,
+        label=_('Site group')
+    )
+    maintainer_id = forms.ModelChoiceField(
         queryset=PhoneMaintainer.objects.all(),
         required=False,
-        label=_('Maintainer'),
+        label=_('Maintainer')
+    )
+    
+    fieldsets = (
+        FieldSet(
+            'region_id', 'group_id', 'site_id',
+            name=_('Location')
+        ),
+        FieldSet(
+            'maintainer_id',
+            name=_('Attributes')
+        )
     )
 
 
