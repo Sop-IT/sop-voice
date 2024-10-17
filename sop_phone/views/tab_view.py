@@ -31,7 +31,10 @@ class PhoneSiteTabView(View, ContentTypePermissionRequiredMixin, ActionsMixin):
     '''
     tab = ViewTab(
         label="Phone",
-        badge=lambda obj: count_all_did(PhoneDID.objects.filter(delivery__site=obj)).__int__()
+        badge=lambda obj: count_all_did(
+            PhoneDID.objects.filter(delivery__site=obj),
+            PhoneDelivery.objects.filter(site=obj)
+        ).__int__()
     )
     template_name = "sop_phone/tab/tab.html"
 

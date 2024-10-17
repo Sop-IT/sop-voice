@@ -3,7 +3,7 @@ from netbox.views import generic
 from tenancy.views import ObjectContactsView
 from utilities.views import GetRelatedModelsMixin, register_model_view
 
-from ..models import PhoneMaintainer, PhoneInfo, PhoneDID
+from ..models import PhoneMaintainer, PhoneInfo, PhoneDID, PhoneDelivery
 from ..filtersets import PhoneMaintainerFilterSet
 from ..tables.phone_maintainer import *
 from ..forms.phone_maintainer import *
@@ -38,7 +38,10 @@ class PhoneMaintainerView(generic.ObjectView, GetRelatedModelsMixin):
         num_did: int = 0
 
         for instance in sites:
-            temp = count_all_did(PhoneDID.objects.filter(delivery__site=instance.site))
+            temp = count_all_did(
+                PhoneDID.objects.filter(delivery__site=instance.site),
+                PhoneDelivery.objects.filter(site=instance.site)
+            )
             num_did += temp.__int__()
 
         return num_did

@@ -27,7 +27,7 @@ def format_number(number:int) -> str:
     '''
     returns {flag} <spaces> {number}
     '''
-    return f'{flag}\u00A0\u00A0\u00A0\u00A0{phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)}'
+    return f'{flag}\u00A0\u00A0\u00A0{phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)}'
 
 
 def get_object_or_create(model, site) -> object | None:
@@ -54,47 +54,62 @@ class count_all_did:
     """counts all numbers inside a given PhoneDID instance
     
     Args:
-        PhoneDID (instance)
+        PhoneDID
+        PhoneDelivery | None
     Returns:
 ```python
     __int__(self):
-        return self.phone_coun)
+        return self.phone_count)
 ```
     """
-    def __init__(self, phone_did) -> None:
+    def __init__(self, phone_did, delivery=None) -> None:
         self.phone_did = phone_did
+        self.delivery = delivery
         self.phone_count = self.count()
 
-    def count_range(self, start: int, end: int) -> int:
-        '''
-        simply counts the number of phone numbers in a range
-        '''
-                
+    def count_range(self, start:int, end:int) -> int:
         if start > end:
             return 0
-        if start == end:
-            return 1
-
         if start < end:
             return (end - start) + 1
         return 0
 
-    def count(self) -> int:
-        phone_count: int = 0
+    def count_delivery(self, deli) -> int:
+        if not deli:
+            return count
+        if deli.ndi:
+            return 1
 
+    def count(self) -> int:
+        phone_count:int = 0
+
+        # count did sda
         try:
+            # try iterable
             for did in self.phone_did:
                 phone_count += self.count_range(did.start, did.end)
         except:
             try:
                 phone_count += self.count_range(self.phone_did.start, self.phone_did.end)
             except:pass
+
+        # count delivery sda
+        try:
+            # try iterable
+            for deli in self.delivery:
+                phone_count += self.count_delivery(deli)
+        except:
+            try:
+                phone_count += self.count_delivery(self.delivery)
+            except:pass
+
         return phone_count
 
     def __int__(self) -> int:
         '''
         ```python
-        return self.phone_count
+        returns self.phone_count
         ```
         '''
         return self.phone_count
+

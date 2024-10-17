@@ -78,12 +78,13 @@ class PhoneDIDDetailView(generic.ObjectView, PermissionRequiredMixin):
     def get_extra_context(self, request, instance):
         context: dict = {}
 
+        context['start'] = format_number(instance.start)
+        context['end'] = format_number(instance.end)
+        context['num_did'] = count_all_did(instance).__int__()
         try:
-            context['start'] = format_number(instance.start)
-            context['end'] = format_number(instance.end)
-            context['num_did'] = count_all_did(instance).__int__()
             context['maintainer'] = PhoneInfo.objects.filter(site=instance.delivery.site).first()
-        except:pass
+        except:
+            pass
         return context
 
 
