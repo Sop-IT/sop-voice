@@ -45,7 +45,7 @@ class PhoneDeliveryTable(NetBoxTable):
         model = PhoneDelivery
         fields = ('pk', 'id', 'actions', 'delivery', 'provider', 'site',
             'channel_count', 'status', 'ndi', 'dto', 'created', 'last_updated', 'description', 'comments')
-        default_columns = ('actions', 'delivery', 'provider', 'status', 'channel_count')
+        default_columns = ('actions', 'site', 'delivery', 'channel_count', 'status', 'ndi', 'dto', 'description')
 
     def render_ndi(self, record):
         return format_number(record.ndi)
