@@ -1,5 +1,6 @@
 import re
 import phonenumbers
+from phonenumbers import NumberParseException
 
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -36,11 +37,27 @@ class PhoneValidator:
             })
 
     @staticmethod
-    def check_delivery(delivery, site) -> None:
+    def check_delivery_site(delivery, site) -> None:
         if delivery and site and delivery.site != site:
             raise ValidationError({
                 'delivery': _("Delivery must be set to the same site as the DID.")
             })
+
+    @staticmethod
+    def check_delivery_overlaps(delivery, start, end) -> None:
+        if not delivery:
+            return
+        lstart = len(str(start))
+        if len(str(delivery.ndi)) == lstart:
+            if start <= delivery.ndi and end >= delivery.ndi:
+                raise ValidationError({
+                    'start': _(f'This range {start} -> {end} overlaps its own delivery MBN/NDI.')
+                })
+        if len(str(delivery.dto)) == lstart:
+            if start <= delivery.dto and end >= delivery.dto:
+                raise ValidationError({
+                    'start': _(f'This range {start} -> {end} overlaps its own delivery DTO.')
+                })
 
     @staticmethod
     def check_number(where:str, number:int) -> None:
@@ -48,10 +65,15 @@ class PhoneValidator:
             raise ValidationError({
                 f'{where}': _("Number must be set in E164 format.")
             })
-        if not phonenumbers.parse(f'+{number}'):
+        try:
+            if not phonenumbers.parse(f'+{number}'):
+                raise ValidationError({
+                    f'{where}': _("Number must be a valid phone number written in E164 format.")
+                })
+        except NumberParseException:
             raise ValidationError({
-                f'{where}': _("Number must be a valid phone number written in E164 format.")
-            })
+                f'{where}': _('Number must be a valid phone number written in E164 format')
+                })
 
     @staticmethod
     def check_start_end(start:int, end:int) -> None:
