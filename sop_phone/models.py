@@ -294,10 +294,10 @@ class PhoneDelivery(NetBoxModel):
                 raise ValidationError({
                     'ndi': _(f'The MBN/NDI {self.ndi} already exists on another delivery.')
                 })
-            if PhoneDelivery.objects.filter(dto=self.ndi).exists():
+            if PhoneDelivery.objects.filter(pk=self.pk, dto=self.ndi):
                 raise ValidationError({
-                    'ndi': _(f'The MBN/NDI {self.ndi} overlaps DTO on another delivery.')
-                })
+                    'ndi': _(f'The MBN/NDI {self.ndi} cannot be the DTO of its own delivery.')
+                    })
             lndi = len(str(self.ndi))
             for rng in PhoneDID.objects.exclude(site=self.site):
                 if len(str(rng.start)) == lndi:
