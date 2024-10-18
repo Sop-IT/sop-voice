@@ -55,7 +55,6 @@ class count_all_did:
     
     Args:
         PhoneDID
-        PhoneDelivery | None
     Returns:
 ```python
     __int__(self):
@@ -68,17 +67,12 @@ class count_all_did:
         self.phone_count = self.count()
 
     def count_range(self, start:int, end:int) -> int:
+        count:int = 0
         if start > end:
             return 0
         if start < end:
-            return (end - start) + 1
-        return 0
-
-    def count_delivery(self, deli) -> int:
-        if not deli:
-            return count
-        if deli.ndi:
-            return 1
+            count = (end - start) + 1
+        return count
 
     def count(self) -> int:
         phone_count:int = 0
@@ -88,19 +82,32 @@ class count_all_did:
             # try iterable
             for did in self.phone_did:
                 phone_count += self.count_range(did.start, did.end)
+
         except:
             try:
                 phone_count += self.count_range(self.phone_did.start, self.phone_did.end)
             except:pass
+        
+        # if no delivery provided, abort
+        if not self.delivery:
+            return phone_count
 
-        # count delivery sda
         try:
-            # try iterable
-            for deli in self.delivery:
-                phone_count += self.count_delivery(deli)
+            # try iterable -> multi instance provided
+            for d in self.delivery.values_list('ndi', flat=True):
+                for did in self.phone_did:
+                    if did.start <= d and did.end >= d:
+                        break
+
+                phone_count += 1
+
         except:
+            # no iterable -> one instance is provided
             try:
-                phone_count += self.count_delivery(self.delivery)
+                for did in self.phone_did:
+                    if did.start <= self.delivery.ndi and did.end >= self.delivery.ndi:
+                        return phone_count
+                    phone_count += 1
             except:pass
 
         return phone_count
