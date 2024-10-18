@@ -168,7 +168,7 @@ class PhoneDeliveryForm(NetBoxModelForm):
 
     fieldsets = (
         FieldSet(
-            'delivery', 'provider', 'status', 'channel_count', 'ndi', 'dto',
+            'delivery', 'provider', 'status', 'channel_count', 'ndi', 'dto', 'description',
             name=_('Delivery')
         ),
         FieldSet(
