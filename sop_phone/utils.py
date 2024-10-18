@@ -68,11 +68,34 @@ class count_all_did:
 
     def count_range(self, start:int, end:int) -> int:
         count:int = 0
+
+        if start == end:
+            return 1
         if start > end:
             return 0
         if start < end:
             count = (end - start) + 1
         return count
+
+    def count_ndi_outside_ranges(self, phone_count) -> int:
+        # if no delivery provided, abort
+        if not self.delivery:
+            return phone_count
+
+        # iterable only in ndi
+        for ndi in self.delivery.values_list('ndi', flat=True):
+            ndi_in_range:bool = False
+
+            # only count if not in range
+            for did in self.phone_did:
+                if did.start <= ndi <= did.end:
+                    ndi_in_range = True
+                    break
+
+            if not ndi_in_range:
+                phone_count += 1
+
+        return phone_count
 
     def count(self) -> int:
         phone_count:int = 0
@@ -92,25 +115,7 @@ class count_all_did:
         if not self.delivery:
             return phone_count
 
-        try:
-            # try iterable -> multi instance provided
-            for d in self.delivery.values_list('ndi', flat=True):
-                for did in self.phone_did:
-                    if did.start <= d and did.end >= d:
-                        break
-
-                phone_count += 1
-
-        except:
-            # no iterable -> one instance is provided
-            try:
-                for did in self.phone_did:
-                    if did.start <= self.delivery.ndi and did.end >= self.delivery.ndi:
-                        return phone_count
-                    phone_count += 1
-            except:pass
-
-        return phone_count
+        return self.count_ndi_outside_ranges(phone_count)
 
     def __int__(self) -> int:
         '''

@@ -58,7 +58,7 @@ class PhoneDeliveryFilterSet(NetBoxModelFilterSet):
 
     class Meta:
         model = PhoneDelivery
-        fields = ('id', 'delivery', 'provider', 'status', 'channel_count', 'ndi', 'dto')
+        fields = ('id', 'site', 'delivery', 'provider', 'status', 'channel_count', 'ndi', 'dto')
 
     def search_maintainer_id(self, queryset, name, value):
         if not value:
@@ -81,6 +81,7 @@ class PhoneDeliveryFilterSet(NetBoxModelFilterSet):
         if not value.strip():
             return queryset
         return queryset.filter(
+            Q(site__name__icontains=value) |
             Q(delivery__icontains=value) |
             Q(provider__name__icontains=value) |
             Q(channel_count__icontains=value) |

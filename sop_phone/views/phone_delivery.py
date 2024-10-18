@@ -66,6 +66,7 @@ class PhoneDeliveryDetailView(generic.ObjectView, PermissionRequiredMixin, GetRe
         if instance.dto:
             context['dto'] = format_number(instance.dto)
         context['did_range'] = PhoneDID
+        context['num_range'] = did.count()
         context['num_did'] = count_all_did(did).__int__()
         context['related_models'] = self.get_related_models(
             request, instance,
