@@ -44,15 +44,10 @@ class PhoneValidator:
             })
 
     @staticmethod
-    def check_delivery_overlaps(delivery, start, end) -> None:
+    def check_delivery_overlaps(delivery, start:int, end:int) -> None:
         if not delivery:
             return
         lstart = len(str(start))
-        if len(str(delivery.ndi)) == lstart:
-            if start <= delivery.ndi and end >= delivery.ndi:
-                raise ValidationError({
-                    'start': _(f'This range {start} -> {end} overlaps its own delivery MBN/NDI.')
-                })
         if len(str(delivery.dto)) == lstart:
             if start <= delivery.dto and end >= delivery.dto:
                 raise ValidationError({

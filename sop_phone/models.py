@@ -299,7 +299,7 @@ class PhoneDelivery(NetBoxModel):
                     'ndi': _(f'The MBN/NDI {self.ndi} overlaps DTO on another delivery.')
                 })
             lndi = len(str(self.ndi))
-            for rng in PhoneDID.objects.all():
+            for rng in PhoneDID.objects.exclude(site=self.site):
                 if len(str(rng.start)) == lndi:
                     if self.ndi <= rng.end and rng.start <= self.ndi:
                         raise ValidationError({
@@ -387,26 +387,26 @@ class PhoneDID(NetBoxModel):
             PhoneValidator.check_number('end', self.end)
             PhoneValidator.check_start_end(self.start, self.end)  
 
-        if PhoneDelivery.objects.filter(ndi=self.start).exists():
+        if PhoneDelivery.objects.exclude(site=self.site).filter(ndi=self.start).exists():
             raise ValidationError({
                 'start': _(f'Start {self.start} overlaps a delivery MBN/NDI.')
                 })
-        if PhoneDelivery.objects.filter(ndi=self.end).exists():
+        if PhoneDelivery.objects.exclude(site=self.site).filter(ndi=self.end).exists():
             raise ValidationError({
-                'end': _(f'End {self.end} overlap a delivery MBN/NDI.')
+                'end': _(f'End {self.end} overlaps a delivery MBN/NDI')
                 })
 
-        # check if current range overlaps its own delivery
+        # check if the current range overlaps its own DTO
         PhoneValidator.check_delivery_overlaps(self.delivery, self.start, self.end)
         # check if self.end or self.start overlaps an existing DID range
         lnum=len(str(self.start))
-        for ndi in PhoneDelivery.objects.values_list('ndi', flat=True):
+        for ndi in PhoneDelivery.objects.exclude(site=self.site).values_list('ndi', flat=True):
             #only compare if numbers are comaprable (have the same length)
             if len(str(ndi)) == lnum:
                 # check if number overlap
                 if self.start <= ndi and self.end >= ndi:
                     raise ValidationError({
-                        'start': _(f'This range {self.start} -> {self.end} overlaps a delivery MBN/NDI.')
+                        'start': _(f'This range {self.start} -> {self.end} overlaps a delivery MBN/NDI')
                     })
 
         for rng in PhoneDID.objects.exclude(pk=self.pk):
