@@ -5,6 +5,8 @@ from phonenumbers import NumberParseException
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 
+from .utils import format_number
+
 
 __all__ = (
     'PhoneValidator',
@@ -40,7 +42,7 @@ class PhoneValidator:
     def check_delivery_site(delivery, site) -> None:
         if delivery and site and delivery.site != site:
             raise ValidationError({
-                'delivery': _("Delivery must be set to the same site as the DID.")
+                'delivery': _("{site}: Delivery must be set to the same site as the DID.")
             })
 
     @staticmethod
@@ -51,7 +53,8 @@ class PhoneValidator:
         if len(str(delivery.dto)) == lstart:
             if start <= delivery.dto and end >= delivery.dto:
                 raise ValidationError({
-                    'start': _(f'This range {start} -> {end} overlaps its own delivery DTO.')
+                    'start': _(f'{delivery.site}: This range {format_number(start)} -> {format_number(end)}\
+ overlaps its own delivery DTO.')
                 })
 
     @staticmethod

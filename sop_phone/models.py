@@ -303,7 +303,7 @@ class PhoneDelivery(NetBoxModel):
                 if len(str(rng.start)) == lndi:
                     if self.ndi <= rng.end and rng.start <= self.ndi:
                         raise ValidationError({
-                            'ndi': _(f'{self.site}: The MBN/NDI {self.ndi} overlap DID range {format_number(rng.start)}
+                            'ndi': _(f'{self.site}: The MBN/NDI {self.ndi} overlap DID range {format_number(rng.start)}\
  -> {format_number(rng.end)}')
                         })
         if self.dto:
@@ -391,11 +391,11 @@ class PhoneDID(NetBoxModel):
 
         if PhoneDelivery.objects.exclude(site=self.site).filter(ndi=self.start).exists():
             raise ValidationError({
-                'start': _(f'{self.site}: Start {format_number(self.start)} overlaps {PhoneDelivery.objects.get(ndi=self.start)} delivery MBN/NDI.')
+                'start': _(f'{self.site}: Start {format_number(self.start)} overlaps {format_number(PhoneDelivery.objects.get(ndi=self.start))} delivery MBN/NDI.')
                 })
         if PhoneDelivery.objects.exclude(site=self.site).filter(ndi=self.end).exists():
             raise ValidationError({
-                'end': _(f'{self.site}: End {format_number(self.end)} overlaps {PhoneDelivery.objects.get(ndi=self.end)} delivery MBN/NDI.')
+                'end': _(f'{self.site}: End {format_number(self.end)} overlaps {format_number(PhoneDelivery.objects.get(ndi=self.end))} delivery MBN/NDI.')
                 })
 
         # check if the current range overlaps its own DTO
