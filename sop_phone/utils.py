@@ -3,9 +3,15 @@ import phonenumbers
 
 __all__ = (
     'format_number',
+    'format_number_error',
     'count_all_did',
     'get_object_or_create',
 )
+
+def format_number_error(number:int) -> str:
+    prepare_number:str = f'+{str(number)}'
+    parsed_number = phonenumbers.parse(prepare_number)
+    return f'{phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)}'
 
 
 def format_number(number:int) -> str:

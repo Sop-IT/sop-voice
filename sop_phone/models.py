@@ -13,7 +13,7 @@ from circuits.models import Provider
 from dcim.models import Site
 
 from .validators import PhoneValidator, PhoneMaintainerValidator
-from .utils import format_number
+from .utils import format_number, format_number_error
 
 
 __all__ = (
@@ -291,26 +291,26 @@ class PhoneDelivery(NetBoxModel):
             PhoneValidator.check_number('ndi', self.ndi)
             if PhoneDelivery.objects.exclude(pk=self.pk).filter(ndi=self.ndi).exists():
                 raise ValidationError({
-                    'ndi': _(f'{self.site}: The MBN/NDI {format_number(self.ndi)} already exists on another\
+                    'ndi': _(f'{self.site}: The MBN/NDI {format_number_error(self.ndi)} already exists on another\
  delivery on site {PhoneDelivery.objects.get(ndi=self.ndi)}')
                 })
             if PhoneDelivery.objects.filter(pk=self.pk, dto=self.ndi):
                 raise ValidationError({
-                    'ndi': _(f'{self.site}: The MBN/NDI {format_number(self.ndi)} cannot be the DTO of its own delivery.')
+                    'ndi': _(f'{self.site}: The MBN/NDI {format_number_error(self.ndi)} cannot be the DTO of its own delivery.')
                     })
             lndi = len(str(self.ndi))
             for rng in PhoneDID.objects.exclude(site=self.site):
                 if len(str(rng.start)) == lndi:
                     if self.ndi <= rng.end and rng.start <= self.ndi:
                         raise ValidationError({
-                            'ndi': _(f'{self.site}: The MBN/NDI {self.ndi} overlap DID range {format_number(rng.start)}\
- -> {format_number(rng.end)}')
+                            'ndi': _(f'{self.site}: The MBN/NDI {self.ndi} overlap DID range {format_number_error(rng.start)}\
+ -> {format_number_error(rng.end)}')
                         })
         if self.dto:
             PhoneValidator.check_number('dto', self.dto)
             if self.ndi == self.dto:
                 raise ValidationError({
-                    'dto': _(f'{self.site}: The DTO {format_number(self.dto)} cannot be the MBN/NDI of its own delivery.')
+                    'dto': _(f'{self.site}: The DTO {format_number_error(self.dto)} cannot be the MBN/NDI of its own delivery.')
                     })
             current = PhoneDelivery.objects.filter(pk=self.pk)
             if current.exists and PhoneDID.objects.filter(delivery=current.first()):
@@ -319,8 +319,8 @@ class PhoneDelivery(NetBoxModel):
                     if len(str(rng.start)) == ldto:
                         if self.dto <= rng.end and rng.start <= self.dto:
                             raise ValidationError({
-                                'dto': _(f'The DTO {format_number(self.dto)} overlaps DID range\
- {format_number(rng.start)} -> {format_number(rng.end)}')
+                                'dto': _(f'The DTO {format_number_error(self.dto)} overlaps DID range\
+ {format_number_error(rng.start)} -> {format_number_error(rng.end)}')
                                 })
 
     class Meta(NetBoxModel.Meta):
@@ -372,7 +372,7 @@ class PhoneDID(NetBoxModel):
         if not self.start and not self.end:
             return f'No DID'
         # \u00A0 is unicode for ' '
-        return f'{format_number(self.start)}\u00A0\u00A0\u00A0\u00A0>>\u00A0\u00A0\u00A0\u00A0{format_number(self.end)}'
+        return f'{format_number(number=self.start)}\u00A0\u00A0\u00A0\u00A0>>\u00A0\u00A0\u00A0\u00A0{format_number(number=self.end)}'
 
     def get_absolute_url(self) -> str:
         return reverse('plugins:sop_phone:phonedid_detail', args=[self.pk])
@@ -391,11 +391,11 @@ class PhoneDID(NetBoxModel):
 
         if PhoneDelivery.objects.exclude(site=self.site).filter(ndi=self.start).exists():
             raise ValidationError({
-                'start': _(f'{self.site}: Start {format_number(self.start)} overlaps {format_number(PhoneDelivery.objects.get(ndi=self.start))} delivery MBN/NDI.')
+                'start': _(f'{self.site}: Start {format_number_error(self.start)} overlaps {format_number_error(PhoneDelivery.objects.get(ndi=self.start))} delivery MBN/NDI.')
                 })
         if PhoneDelivery.objects.exclude(site=self.site).filter(ndi=self.end).exists():
             raise ValidationError({
-                'end': _(f'{self.site}: End {format_number(self.end)} overlaps {format_number(PhoneDelivery.objects.get(ndi=self.end))} delivery MBN/NDI.')
+                'end': _(f'{self.site}: End {format_number_error(self.end)} overlaps {format_number_error(PhoneDelivery.objects.get(ndi=self.end))} delivery MBN/NDI.')
                 })
 
         # check if the current range overlaps its own DTO
@@ -408,7 +408,7 @@ class PhoneDID(NetBoxModel):
                 # check if number overlap
                 if self.start <= deli.ndi and self.end >= deli.ndi:
                     raise ValidationError({
-                        'start': _(f'{self.site}: This range {format_number(self.start)} -> {format_number(self.end)}\
+                        'start': _(f'{self.site}: This range {format_number_error(self.start)} -> {format_number_error(self.end)}\
  overlaps {deli.site} delivery MBN/NDI.')
                     })
 
@@ -418,8 +418,8 @@ class PhoneDID(NetBoxModel):
                 # check if number overlap
                 if self.start <= rng.end and rng.start <= self.end:
                     raise ValidationError({
-                        'start': _(f'{self.site}: This range {format_number(self.start)} -> {format_number(self.end)}\
- overlaps range {format_number(rng.start)} -> {format_number(rng.end)} on site {rng.site}.')
+                        'start': _(f'{self.site}: This range {format_number_error(self.start)} -> {format_number_error(self.end)}\
+ overlaps range {format_number_error(rng.start)} -> {format_number_error(rng.end)} on site {rng.site}.')
                         })
 
     def save(self, *args, **kwargs):
