@@ -85,9 +85,16 @@ class count_all_did:
         # iterable only in ndi
         for ndi in self.delivery.values_list('ndi', flat=True):
             ndi_in_range:bool = False
+            
+            if ndi is None:
+                break
 
             # only count if not in range
             for did in self.phone_did:
+                if did is None:
+                    break
+                if did.start is None or did.end is None:
+                    break
                 if did.start <= ndi <= did.end:
                     ndi_in_range = True
                     break
