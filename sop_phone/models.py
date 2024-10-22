@@ -176,11 +176,6 @@ class PhoneMaintainer(PrimaryModel, ContactsMixin):
             )
         )
 
-    def fail(self, message, field=None):
-        if field is not None:
-            raise ValidationError({field: message})
-        raise ValidationError(message)
-
     def clean(self):
         super().clean()
         if self.physical_address:
