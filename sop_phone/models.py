@@ -383,14 +383,17 @@ class PhoneDID(NetBoxModel):
         else :
             PhoneValidator.check_number('end', self.end)
             PhoneValidator.check_start_end(self.start, self.end)  
-
-        if PhoneDelivery.objects.exclude(site=self.site).filter(ndi=self.start).exists():
+        
+        # check if start / end overlaps another site NDI.
+        phd = PhoneDelivery.objects.exclude(site=self.site).filter(ndi=self.start)
+        if phd.exists():
             raise ValidationError({
-                'start': _(f'{self.site}: Start {format_number_error(self.start)} overlaps {format_number_error(PhoneDelivery.objects.get(ndi=self.start))} delivery MBN/NDI.')
+                'start': _(f'{self.site}: Start {format_number_error(self.start)} overlaps {format_number_error(phd.first().ndi)} delivery MBN/NDI.')
                 })
-        if PhoneDelivery.objects.exclude(site=self.site).filter(ndi=self.end).exists():
+        phd = PhoneDelivery.objects.exclude(site=self.site).filter(ndi=self.end)
+        if phd.exists():
             raise ValidationError({
-                'end': _(f'{self.site}: End {format_number_error(self.end)} overlaps {format_number_error(PhoneDelivery.objects.get(ndi=self.end))} delivery MBN/NDI.')
+                'end': _(f'{self.site}: End {format_number_error(self.end)} overlaps {format_number_error(phd.first().ndi)} delivery MBN/NDI.')
                 })
 
         # check if the current range overlaps its own DTO
