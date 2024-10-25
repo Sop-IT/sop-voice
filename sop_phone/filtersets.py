@@ -298,9 +298,29 @@ class PhoneDIDFilterSet(NetBoxModelFilterSet):
             return queryset.filter(site_id__in=site_ids)
         except:return queryset
 
+    def search_partial_quicksearch(self, queryset, name, value):
+        # if no integer, returns None to avoid useless calculations
+        if not value:
+            return None
+        return self.search_partial_number(queryset, name, value)
+
     def search(self, queryset, name, value):
-        if not value.strip():
+        # skip + char because it is not saved in database, only in front for format purposes.
+        striped= value.strip().replace('+', '')
+        if not striped:
             return queryset
+
+        # try parse int value.strip()
+        try:
+            int_val = int(striped)
+        except ValueError:
+            int_val = None
+        # if it is an integer, try partial quicksearch algorithm
+        query = self.search_partial_quicksearch(queryset, name, int_val)
+        # only returns partial quicksearch if it found something
+        if query is not None:
+            return query
+        # else returns the basic Django quicksearch using database
         return queryset.filter(
             Q(start__icontains=value) |
             Q(end__icontains=value) |
@@ -308,3 +328,4 @@ class PhoneDIDFilterSet(NetBoxModelFilterSet):
             Q(delivery__delivery__icontains=value) |
             Q(delivery__provider__name__icontains=value)
         )
+
