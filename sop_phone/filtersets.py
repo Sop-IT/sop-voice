@@ -304,12 +304,24 @@ class PhoneDIDFilterSet(NetBoxModelFilterSet):
             return None
         return self.search_partial_number(queryset, name, value)
 
+    def respect_format(self, value:str) -> int|str:
+        # as the front format may be +11 22.33-66 ect...
+        # if input contains . or - , try to skip it
+        try:
+            f:int = int(''.join(c for c in value if c.isdigit()))
+            return f
+        except ValueError:
+            return value
+
     def search(self, queryset, name, value):
         # skip + char because it is not saved in database, only in front for format purposes.
-        striped= value.strip().replace('+', '')
+        striped = value.strip().replace('+', '')
         if not striped:
             return queryset
+        #if you want to implement real-time partial search number,
+        #uncomment the snippet
 
+        '''
         # try parse int value.strip()
         try:
             int_val = int(striped)
@@ -320,10 +332,11 @@ class PhoneDIDFilterSet(NetBoxModelFilterSet):
         # only returns partial quicksearch if it found something
         if query is not None:
             return query
+        '''
         # else returns the basic Django quicksearch using database
         return queryset.filter(
-            Q(start__icontains=value) |
-            Q(end__icontains=value) |
+            Q(start__icontains=self.respect_format(value)) |
+            Q(end__icontains=self.respect_format(value)) |
             Q(site__name__icontains=value) |
             Q(delivery__delivery__icontains=value) |
             Q(delivery__provider__name__icontains=value)
