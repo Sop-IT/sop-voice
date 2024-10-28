@@ -3,6 +3,7 @@
 export TWINE_USERNAME="$pypi_name"
 export TWINE_PASSWORD="$phone_api"
 
+source venv/bin/activate
 python3 setup.py sdist bdist_wheel
 twine upload --skip-existing --verbose dist/*
 
