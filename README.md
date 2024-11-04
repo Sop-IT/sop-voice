@@ -36,7 +36,7 @@ sudo ./upgrade.sh
 
 This plugin provides the following features:
 -   Add a new "**Phone**" tab in */dcim/sites/your_site_id*
--   Add a new item "**Phoen**" in the navigation menu bar
+-   Add a new item "**Phone**" in the navigation menu bar
 -   A fast pattern phone-number search for every in-range numbers.
 
 ## Models
@@ -49,4 +49,14 @@ This plugin provides the following features:
 ## API
 
 -   [**Phone API**](https://github.com/sop-it/sop-voice/tree/main/docs/api.md)
+
+## UNIT-TESTS
+
+This plugin has django unit-test in order to check its proper functioning as modifications are made.
+To run the unit-test, it is recommended to add **django-test-without-migrations** in NetBox *local_requirements*.
+
+And run it like this:
+```bash
+python3 netbox/manage.py test -n sop_phone.tests
+```
 
