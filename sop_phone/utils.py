@@ -5,7 +5,6 @@ __all__ = (
     'format_number',
     'format_number_error',
     'count_all_did',
-    'get_object_or_create',
 )
 
 def format_number_error(number:int) -> str:
@@ -34,26 +33,6 @@ def format_number(number:int) -> str:
     returns {flag} <spaces> {number}
     '''
     return f'{flag}\u00A0\u00A0\u00A0{phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)}'
-
-
-def get_object_or_create(model, site) -> object | None:
-    '''
-    get the model instance or create it
-    (for dcim/site extra models)
-    '''
-    target = model.objects.filter(site=site)
-
-    if target.exists():
-
-        if target.filter(maintainer__isnull=False).exists():
-            return target.filter(maintainer__isnull=False).first()
-
-        return target.first()
-    
-    target = model(site=site)
-    target.save()
-
-    return target
 
 
 class count_all_did:
