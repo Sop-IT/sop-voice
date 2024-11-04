@@ -135,19 +135,18 @@
         {% for qs, filter_param in related_models %}
           {% with viewname=qs.model|validated_viewname:"list" %}
             {% if viewname is not None %}
+              <!-- do not display PhoneInfo-->
+              {% if qs.model|meta:"verbose_name" == "Information" %}
+              {% else %}
 
             <!-- __________________________________________________
-              i just added theses lines to link the site ids 
+              link related Sites
             -->
               {% if qs.model|meta:"verbose_name_plural"|bettertitle == "Sites" and site_ids %}
                 <a href="/dcim/sites/?{% for site_id in site_ids %}id={{site_id.site__id}}{% if not forloop.last %}&{% endif %}{% endfor %}"
                 class="list-group-item list-group-item-action d-flex justify-content-between">
               {% else %}
-            <!-- this is the original </a> for all others params -->
               <a href="{% url viewname %}?{{ filter_param }}={{ object.pk }}" class="list-group-item list-group-item-action d-flex justify-content-between">
-            <!-- __________________________________________________
-              and the endif token
-            -->
               {% endif %}
             <!--__________________________________________________-->
               {{ qs.model|meta:"verbose_name_plural"|bettertitle }}
@@ -159,6 +158,7 @@
                 {% endif %}
               {% endwith %}
             </a>
+            {% endif %}
             {% endif %}
           {% endwith %}
         {% endfor %}
