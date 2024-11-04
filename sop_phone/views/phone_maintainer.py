@@ -45,7 +45,7 @@ class PhoneMaintainerView(generic.ObjectView, GetRelatedModelsMixin):
             num_did += temp.__int__()
 
         return num_did
-    
+
     def get_format(self, values) -> str | None:
         qs = [str(item['site__id']) for item in values]
         if qs == []:
@@ -60,7 +60,7 @@ class PhoneMaintainerView(generic.ObjectView, GetRelatedModelsMixin):
         context: dict = {}
 
         sites = PhoneInfo.objects.filter(maintainer=instance)
-        site_ids = (PhoneInfo.objects.filter(maintainer=instance).values('site__id'))
+        site_ids = sites.values('site__id')
 
         context['num_did'] = self.count_did(sites)
         context['site_ids'] = site_ids
@@ -69,10 +69,10 @@ class PhoneMaintainerView(generic.ObjectView, GetRelatedModelsMixin):
             instance, 
             extra=(
                 (Site.objects.filter(
-                    pk__in=(PhoneInfo.objects.filter(maintainer=instance).values('site__id'))
+                    pk__in=site_ids
                 ), 'id'),
                 (PhoneDID.objects.filter(
-                    delivery__site__in=PhoneInfo.objects.filter(maintainer=instance).values('site_id')
+                    delivery__site__in=site_ids
                 ), 'maintainer_id')
             )
         )
@@ -135,3 +135,4 @@ class PhoneMaintainerBulkImportView(generic.BulkImportView):
 @register_model_view(PhoneMaintainer, 'contacts')
 class PhoneMaintainerContactsView(ObjectContactsView):
     queryset = PhoneMaintainer.objects.all()
+
