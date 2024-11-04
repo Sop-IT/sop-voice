@@ -60,7 +60,7 @@ class PhoneDeliveryFilterForm(NetBoxModelFilterSetForm):
     channel_count = forms.IntegerField(
         required=False,
         label=_('Channel count'),
-        help_text=_('G.711 cidec - 96kbps reserved bandwidth per channel / NUMBER ONLY')
+        help_text=_('G.711 codec - 96kbps reserved bandwidth per channel / NUMBER ONLY')
     )
     ndi = forms.IntegerField(
         required=False,
@@ -147,7 +147,7 @@ class PhoneDeliveryForm(NetBoxModelForm):
     channel_count = forms.IntegerField(
         required=False,
         label=_('Channel Count'),
-        help_text=_('G.711 cidec - 96kbps reserved bandwidth per channel / NUMBER ONLY')
+        help_text=_('G.711 codec - 96kbps reserved bandwidth per channel / NUMBER ONLY')
     )
     status = forms.ChoiceField(
         choices=PhoneDeliveryStatusChoices,
@@ -185,3 +185,4 @@ class PhoneDeliveryForm(NetBoxModelForm):
         super().__init__(*args, **kwargs)
         if 'tags' in self.fields:
             del self.fields['tags']
+
