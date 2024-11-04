@@ -53,7 +53,11 @@ This plugin provides the following features:
 ## UNIT-TESTS
 
 This plugin has django unit-test in order to check its proper functioning as modifications are made.
-To run the unit-test, it is recommended to add **django-test-without-migrations** in NetBox *local_requirements*.
+To run the unit-test, it is recommended to add *django-test-without-migrations* in NetBox *local_requirements.txt*.
+
+```bash
+echo -e "django-test-without-migrations" >> local_requirements.txt
+```
 
 And run it like this:
 ```bash
