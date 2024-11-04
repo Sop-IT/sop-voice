@@ -11,7 +11,7 @@
     {% if 'add' in permi %}
     <div class="card-actions">
         <a href="{% url reversed_url pk=pk %}" class="btn btn-ghost-primary btn-sm">
-            <i class="mdi mdi-plust-thick" aria-hidden="true"></i>Add a {{object|meta:"verbose_name"}}
+            <i class="mdi mdi-plus-thick" aria-hidden="true"></i>Add a {{object|meta:"verbose_name"}}
         </a>
     </div>
     {% endif %}
