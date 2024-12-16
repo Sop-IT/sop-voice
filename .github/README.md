@@ -1,66 +1,68 @@
-# NetBox - Sop-Phone plugin
+<h1 align="center">
+    NetBox - SOP-Phone plugin<br>
+</h1>
+<p align="center">
+    <a href="https://github.com/netbox-community/netbox">NetBox</a> plugin to manage phone informations for each site.
+</p>
 
-> [NetBox](https://github.com/netbox-community/netbox) plugin to manage phone informations for each site.
+---
 
-## Installation
+## 🚀 Features
+
+- [**Counting**](/docs/features/counting.md)
+- [**Format**](/docs/features/format.md)
+- [**Search**](/docs/features/search.md)
+
+---
+
+## 📦 Installation
 
 ### Prerequisites
 
-This plugin requires phonenumbers to work.
+Ensure you have the following requirements:
 
-```bash
-echo "phonenumbers" >> local_requirements.txt
-```
+- NetBox 4.1.0+
+- Python 3.x
+- `phonenumbers` library
 
-### Auto-upgrade installation
+### Installation Steps
 
-Add the plugin to NetBox local_requirements
-```bash
-echo "sop-phone" >> local_requirements.txt
-```
+1. **Add Requirements**
 
-Add the plugin to netbox/configuration.py
-```python
-PLUGINS = [
-    ...
-    'sop-phone',
-]
-```
+   ```bash
+   # add phonenumbers library
+   echo "phonenumbers" >> local_requirements.txt
 
-Run NetBox upgrade.sh script
-```bash
-sudo ./upgrade.sh
-```
+   # add SOP-Phone plugin
+   echo "sop-phone" >> local_requirements.txt
+   ```
 
-## Features
+2. **Configure NetBox**
+   Edit `netbox/netbox/configuration.py` to include the plugin:
 
-This plugin provides the following features:
--   Add a new "**Phone**" tab in */dcim/sites/your_site_id*
--   Add a new item "**Phone**" in the navigation menu bar
--   A fast pattern phone-number search for every in-range numbers.
+   ```python
+   PLUGINS = [
+       # ... other plugins
+       'sop-phone',
+   ]
+   ```
 
-## Models
+3. **Upgrade NetBox**
+   ```bash
+   sudo ./upgrade.sh
+   ```
 
--   [**Phone Maintainer**](https://github.com/sop-it/sop-voice/tree/main/docs/phone-maintainer.md)
--   [**Phone Info**](https://github.com/sop-it/sop-voice/tree/main/docs/phone-info.md)
--   [**Phone Delivery**](https://github.com/sop-it/sop-voice/tree/main/docs/phone-delivery.md)
--   [**Phone DIDs**](https://github.com/sop-it/sop-voice/tree/main/docs/phone-dids.md)
+## 📋 Models
 
-## API
+The SOP-Phone plugin provides four core models:
 
--   [**Phone API**](https://github.com/sop-it/sop-voice/tree/main/docs/api.md)
+- [**Phone Maintainer**](/docs/models/phone-maintainer.md)
+- [**Phone Info**](/docs/models/phone-info.md)
+- [**Phone Delivery**](/docs/models/phone-delivery.md)
+- [**Phone DIDs**](/docs/models/phone-did.md)
 
-## UNIT-TESTS
+---
 
-This plugin has django unit-test in order to check its proper functioning as modifications are made.
-To run the unit-test, it is recommended to add *django-test-without-migrations* in NetBox *local_requirements.txt*.
+## 🛠️ Development
 
-```bash
-echo -e "django-test-without-migrations" >> local_requirements.txt
-```
-
-And run it like this:
-```bash
-python3 netbox/manage.py test -n sop_phone.tests
-```
-
+- [**Unit-Tests**](/docs/development/unit-test.md)
