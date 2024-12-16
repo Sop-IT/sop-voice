@@ -51,7 +51,7 @@ mkdir -p tests
 touch tests/test_validations.py
 ```
 
-2. **Import your dependecies**
+2. **Import your dependencies**
 
 ```python
 #mandatory NetBox TestCase class
@@ -145,13 +145,4 @@ def test_this_view_perm(self):
     self.add_permissions('my_view_url_permissions')
     self.assertHttpStatus(response, 200)
 
-```
-
-6. **Run Unit-Tests**
-
-Run unit-tests manually:
-
-```bash
-source venv/bin/activate
-python3 netbox/manage.py test -n sop_phone.tests
 ```

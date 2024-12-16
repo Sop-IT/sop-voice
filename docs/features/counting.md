@@ -1,5 +1,5 @@
 <h1 align="center">
-    Format<br>
+    Counting<br>
 </h1>
 
 ## Overview

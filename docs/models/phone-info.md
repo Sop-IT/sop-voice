@@ -1,5 +1,5 @@
 <h1 align="center">
-    Phone Maintainer<br>
+    Phone Information<br>
 </h1>
 
 ## Overview
