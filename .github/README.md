@@ -65,5 +65,6 @@ The SOP-Phone plugin provides four core models:
 
 ## 🛠️ Development
 
-- [**Deploy**](/docs/development/deploy.md)
+- [**Contribute**](/docs/development/contribute.md)
 - [**Unit-Tests**](/docs/development/unit-test.md)
+- [**Deploy**](/docs/development/deploy.md)
