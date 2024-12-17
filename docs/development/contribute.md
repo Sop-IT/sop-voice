@@ -1,5 +1,5 @@
 <h1 align="center">
-    Deploy<br>
+    Contribute<br>
 </h1>
 
 ---
@@ -35,7 +35,7 @@ git clone https://github.com/Sop-IT/sop-voice.git
 Move the plugin in NetBox application root:
 
 > [!TIP]
-> Application root is the `netbox/` folder with `dcim/` `ipam`...
+> Application root is the `netbox/` folder with `dcim/` `ipam/`...
 
 ```bash
 cd sop-voice
@@ -61,7 +61,7 @@ python3 netbox/manage.py runserver --insecure
 ```
 
 Each time you make a change, Django reloads the server.<br>
-Do not forget to add your feature and to run unit-test to make sure you don't break any previous features. Refer to [**unit-test**](./unit-test.md).<br>
+Do not forget to test your feature and to run unit-test to make sure you don't break any previous features. Refer to [**unit-test**](./unit-test.md).<br>
 In order to deploy a new version of the plugin, refer to [**deploy**](./deploy.md).
 
 ---
