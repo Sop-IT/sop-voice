@@ -138,8 +138,8 @@ class PhoneInfoFilterSet(NetBoxModelFilterSet):
         if not value.strip():
             return queryset
         return queryset.filter(
-            Q(maintainer__icontains=value) |
-            Q(site__icontains=value)
+            Q(maintainer__name__icontains=value) |
+            Q(site__name__icontains=value)
         )
 
 
