@@ -26,7 +26,7 @@ urlpatterns = [
     path('phone-maintainer/edit', vm.PhoneMaintainerBulkEditView.as_view(), name='phonemaintainer_bulk_edit'),
     path('phone-maintainer/import', vm.PhoneMaintainerBulkImportView.as_view(), name='phonemaintainer_import'),
     path('phone-maintainer/delete/', vm.PhoneMaintainerBulkDeleteView.as_view(), name='phonemaintainer_bulk_delete'),
-    path('phone-maintainer/<int:pk>/contacts/', vm.PhoneMaintainerContactsView.as_view(), name='phonemaintainer_contacts'),
+    path('phone-maintainer/<int:pk>/contacts/', vm.PhoneMaintainerContactsView.as_view(), name='phonemaintainer_contacts', kwargs={'model': PhoneMaintainer}),
     path('phone-maintainer/edit/<int:pk>', vm.PhoneMaintainerEditView.as_view(), name='phonemaintainer_edit'),
     path('phone-maintainer/delete/<int:pk>', vm.PhoneMaintainerDeleteView.as_view(), name='phonemaintainer_delete'),
     path('phone-maintainer/changelog/<int:pk>', ObjectChangeLogView.as_view(), name='phonemaintainer_changelog', kwargs={'model': PhoneMaintainer}),
