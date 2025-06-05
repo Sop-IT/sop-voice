@@ -10,3 +10,4 @@ dist/
 !remove_old.sh
 venv/
 launch.json
+.vscode/
