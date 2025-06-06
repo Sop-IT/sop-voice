@@ -4,7 +4,7 @@ from netbox.plugins import PluginMenu, PluginMenuButton, PluginMenuItem
 
 
 menu = PluginMenu(
-    label=_('Phone'),
+    label='SOP Phone',
     icon_class="mdi mdi-phone",
     groups=(
         (
