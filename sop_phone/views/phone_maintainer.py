@@ -1,6 +1,5 @@
 from dcim.models import Site
 from netbox.views import generic
-from tenancy.views import ObjectContactsView
 from utilities.views import GetRelatedModelsMixin, register_model_view
 
 from ..models import PhoneMaintainer, PhoneInfo, PhoneDID, PhoneDelivery
@@ -133,6 +132,6 @@ class PhoneMaintainerBulkImportView(generic.BulkImportView):
 
 
 @register_model_view(PhoneMaintainer, 'contacts')
-class PhoneMaintainerContactsView(ObjectContactsView):
+class PhoneMaintainerContactsView(generic.ObjectContactsView):
     queryset = PhoneMaintainer.objects.all()
 
