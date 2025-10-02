@@ -15,27 +15,27 @@ __all__ = (
 
 class PhoneMaintainerViewSet(NetBoxModelViewSet):
     metadata_class = ContentTypeMetadata
-    queryset = PhoneMaintainer.objects.all()
+    queryset = PhoneMaintainer.objects.all().order_by("pk")
     serializer_class = PhoneMaintainerSerializer
     filterset_class = PhoneMaintainerFilterSet
 
 
 class PhoneInfoViewSet(NetBoxModelViewSet):
     metadata_class = ContentTypeMetadata
-    queryset = PhoneInfo.objects.all()
+    queryset = PhoneInfo.objects.all().order_by("pk")
     serializer_class = PhoneInfoSerializer
     filterset_class = PhoneInfoFilterSet
 
 
 class PhoneDIDViewSet(NetBoxModelViewSet):
     metadata_class = ContentTypeMetadata
-    queryset = PhoneDID.objects.all()
+    queryset = PhoneDID.objects.all().order_by("pk")
     serializer_class = PhoneDIDSerializer
     filterset_class = PhoneDIDFilterSet
 
 
 class PhoneDeliveryViewSet(NetBoxModelViewSet):
     metadata_class = ContentTypeMetadata
-    queryset = PhoneDelivery.objects.all()
+    queryset = PhoneDelivery.objects.all().order_by("pk")
     serializer_class = PhoneDeliverySerializer
     filterset_class = PhoneDeliveryFilterSet
