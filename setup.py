@@ -3,15 +3,15 @@ from setuptools import setup, find_packages
 
 setup(
     name='sop-phone',
-    version='0.4.7',
+    version='0.4.8',
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
         'phonenumbers'
     ],
     description="Manage phone informations of each sites.",
-    author = "Soprema NOC team"
-    author_email = "noc@soprema.com"
+    author = "Soprema NOC team",
+    author_email = "noc@soprema.com",
     classifiers=[
         'Framework :: Django',
         'Programming Language :: Python :: 3',
