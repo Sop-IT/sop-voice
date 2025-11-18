@@ -6,6 +6,7 @@ from django.views import View
 from utilities.views import register_model_view, ViewTab, ContentTypePermissionRequiredMixin
 from utilities.permissions import get_permission_for_model
 from netbox.views.generic.mixins import ActionsMixin
+from netbox.constants import DEFAULT_ACTION_PERMISSIONS
 from dcim.models import Site
 
 from ..tables.phone_delivery import *
@@ -37,6 +38,7 @@ class PhoneSiteTabView(View, ContentTypePermissionRequiredMixin, ActionsMixin):
         ).__int__()
     )
     template_name = "sop_phone/tab/tab.html"
+    actions= DEFAULT_ACTION_PERMISSIONS
 
     def get_table(self, table, qs, request):
         table = table(qs, user=request.user)
@@ -47,10 +49,9 @@ class PhoneSiteTabView(View, ContentTypePermissionRequiredMixin, ActionsMixin):
 
     def get_actions(self, request):
         actions:dict = dict()
-
-        actions['DID'] = self.get_permitted_actions(request.user, PhoneDID)
-        actions['Delivery'] = self.get_permitted_actions(request.user, PhoneDelivery)
-        actions['Info'] = self.get_permitted_actions(request.user, PhoneInfo)
+        actions['DID'] = [ act.name for act in self.get_permitted_actions(request.user, PhoneDID) ]
+        actions['Delivery'] = [ act.name for act in self.get_permitted_actions(request.user, PhoneDelivery) ]
+        actions['Info'] = [ act.name for act in self.get_permitted_actions(request.user, PhoneInfo) ]
         return actions
 
     def get_extra_context(self, request, pk) -> dict:

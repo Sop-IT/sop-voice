@@ -271,7 +271,7 @@ class PhoneDelivery(NetBoxModel):
         return PhoneDeliveryStatusChoices.colors.get(self.status)
 
     def __str__(self) -> str:
-        delivery:str = self.delivery if hasattr(self, 'delivery') else 'Unknown delivery'
+        delivery:str|None = self.delivery if hasattr(self, 'delivery') else 'Unknown delivery'
         provider:str = self.provider if hasattr(self, 'provider') else 'Unknown provider'
         return f'{delivery} / {provider}'
 
