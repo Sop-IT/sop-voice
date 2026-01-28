@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from timezone_field import TimeZoneField
 
-from netbox.models import NetBoxModel, PrimaryModel
+from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
 from utilities.choices import ChoiceSet
 from circuits.models import Provider
