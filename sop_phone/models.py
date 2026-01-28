@@ -99,7 +99,16 @@ models.IntegerField.register_lookup(BiAbsoluteValue)
 models.IntegerField.register_lookup(BiFloorValue)
 models.IntegerField.register_lookup(BiLogValue)
 
-class PhoneMaintainer(PrimaryModel, ContactsMixin):
+class PhoneMaintainer(ContactsMixin, NetBoxModel): 
+    description = models.CharField(
+        verbose_name=_('description'),
+        max_length=200,
+        blank=True
+    )
+    comments = models.TextField(
+        verbose_name=_('comments'),
+        blank=True
+    )
     name = models.CharField(
         verbose_name=_('Maintainer'),
         unique=True,
