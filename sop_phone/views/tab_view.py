@@ -41,7 +41,7 @@ class PhoneSiteTabView(View, ContentTypePermissionRequiredMixin, ActionsMixin):
     actions= DEFAULT_ACTION_PERMISSIONS
 
     def get_table(self, table, qs, request):
-        table = table(qs, user=request.user)
+        table = table(qs)
         if 'pk' in table.base_columns:
             table.columns.show('pk')
         table.configure(request)

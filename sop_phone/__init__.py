@@ -5,7 +5,7 @@ class SopPhoneConfig(PluginConfig):
     name = "sop_phone"
     verbose_name = "SOP Phone"
     description = "Manage phone informations of each site."
-    version='0.4.13'
+    version='0.4.14'
     author = "Soprema NOC team"
     author_email = "noc@soprema.com"
     base_url = "sop-phone"
