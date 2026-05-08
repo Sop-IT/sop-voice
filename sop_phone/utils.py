@@ -1,11 +1,21 @@
 import phonenumbers
-
+import math
 
 __all__ = (
-    'format_number',
+    'country_code_to_flag',
+    'format_number_flag',
     'format_number_error',
-    'count_all_did',
+    'number_quicksearch',
 )
+
+def country_code_to_flag(country:str) -> str:
+    '''
+    returns the right flag depending on the country code
+    https://www.johndcook.com/blog/2022/10/02/flags-unicode/
+    '''
+    box = lambda ch: chr( ord(ch) + 0x1f1a5 )
+    return box(country[0]) + box(country[1])
+
 
 def format_number_error(number:int) -> str:
     prepare_number:str = f'+{str(number)}'
@@ -13,18 +23,12 @@ def format_number_error(number:int) -> str:
     return f'{phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)}'
 
 
-def format_number(number:int) -> str:
+def format_number_flag(number:int) -> str:
     '''
     formats E164 numbers
     and displays a beautiful flag
     depending on their country code
     '''
-    def country_code_to_flag(county) -> str:
-        '''
-        returns the right flag depending on the country code
-        '''
-        return chr(ord(country[0]) + 127397) + chr(ord(country[1]) + 127397)
-
     prepare_number:str = f'+{str(number)}'
     parsed_number = phonenumbers.parse(prepare_number)
     country:str = phonenumbers.region_code_for_country_code(parsed_number.country_code)
@@ -35,85 +39,57 @@ def format_number(number:int) -> str:
     return f'{flag}\u00A0\u00A0\u00A0{phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)}'
 
 
-class count_all_did:
-    """counts all numbers inside a given PhoneDID instance
-    
-    Args:
-        PhoneDID
-    Returns:
-```python
-    __int__(self):
-        return self.phone_count)
-```
-    """
-    def __init__(self, phone_did, delivery=None) -> None:
-        self.phone_did = phone_did
-        self.delivery = delivery
-        self.phone_count = self.count()
+def number_quicksearch(first_num: int, last_num: int, lookup_str: str) -> bool:
+    '''
+    does the lookup string occur in range  first_num to last_num  ?
+    Logic is as follows : 
+    - first check is the lookup_str appears either in the first or last numbers
+    - if not, check if it could appear in the number sequence between first and last numbers 
+    '''
+    # Basic sanity checks
+    if first_num>last_num:
+        raise Exception("first_num must be lte last_num")
+    if lookup_str is None or not isinstance(lookup_str, str) or len(lookup_str.strip())==0:
+        raise Exception("lookup_str must be a non-empty string")
+    # Check for simple text match
+    if lookup_str in f"{first_num}" or lookup_str in f"{last_num}":
+        #print("match str")
+        return True
+    # Equal start and end numbers but no text match means no match
+    if first_num==last_num:
+        return False
+    # If the log10 of the difference between start adn end is greater than the number of digits in our lookup we are guaranteed to match
+    lg=math.log10(last_num-first_num)
+    ls=len(lookup_str)
+    if lg > ls:
+        #print(f"match log {first_num=} {last_num=} {lg=} {lookup_str=} {ls=}")
+        return True
+    # No luck, we need to loop !
+    incr = 10 ** ls
+    c = int(lookup_str) 
+    #rounds=0
+    while last_num>=c:
+        # take the last N digits to compare with our lookup value 
+        lo = first_num % incr
+        hi = last_num % incr 
+        if lo > hi:
+            hi += incr
+        if (lo <= c and c <= hi ):
+            #print(f"MATCH {rounds=}  {lo=} {c=} {hi=} ") 
+            return True
+        #print(f"NO match {rounds=}  {lo=} {c=} {hi=} ") 
+        # No luck, we'll shift one digit and retry
+        first_num=first_num//10
+        last_num=last_num//10
+        #print(f"AFTER SHIFT {rounds=}  {first_num=} {last_num=} {lookup_str=} ") 
+        # Shortcut here to avoid looping on same prefixes
+        if first_num == last_num:
+            #print(f"NO match shortcut {rounds=}  {first_num=} {last_num=} {lookup_str=} ") 
+            return False
+        #rounds += 1
+    #print(f"NO match {rounds=}  {first_num=} {last_num=} {lookup_str=} ") 
+    return False
 
-    def count_range(self, start:int, end:int) -> int:
-        count:int = 0
-
-        if start == end:
-            return 1
-        if start > end:
-            return 0
-        if start < end:
-            count = (end - start) + 1
-        return count
-
-    def count_ndi_outside_ranges(self, phone_count) -> int:
-        # if no delivery provided, abort
-        if not self.delivery:
-            return phone_count
-
-        # iterable only in ndi
-        for ndi in self.delivery.values_list('ndi', flat=True):
-            ndi_in_range:bool = False
-            
-            if ndi is None:
-                break
-
-            # only count if not in range
-            for did in self.phone_did:
-                if did is None:
-                    break
-                if did.start is None or did.end is None:
-                    break
-                if did.start <= ndi <= did.end:
-                    ndi_in_range = True
-                    break
-
-            if not ndi_in_range:
-                phone_count += 1
-
-        return phone_count
-
-    def count(self) -> int:
-        phone_count:int = 0
-
-        # count did sda
-        try:
-            # try iterable
-            for did in self.phone_did:
-                phone_count += self.count_range(did.start, did.end)
-
-        except:
-            try:
-                phone_count += self.count_range(self.phone_did.start, self.phone_did.end)
-            except:pass
-        
-        # if no delivery provided, abort
-        if not self.delivery:
-            return phone_count
-
-        return self.count_ndi_outside_ranges(phone_count)
-
-    def __int__(self) -> int:
-        '''
-        ```python
-        returns self.phone_count
-        ```
-        '''
-        return self.phone_count
-
+#number_quicksearch(4926678733150, 4926678734052, "561")
+#number_quicksearch(4926678733150, 4926678734052, "333")
+#number_quicksearch(4926678733150, 4926678734052, "149")

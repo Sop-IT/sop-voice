@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='sop-phone',
-    version='0.4.14',
+    version='0.4.15',
     packages=find_packages(),
     include_package_data=True,
     install_requires=[

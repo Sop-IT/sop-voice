@@ -1,15 +1,13 @@
 import re
 import phonenumbers
-from phonenumbers import NumberParseException
 
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 
-from .utils import format_number_error
+from sop_phone.utils import format_number_error
 
 __all__ = (
     'PhoneValidator',
-    'number_quicksearch',
     'PhoneMaintainerValidator',
 )
 
@@ -67,7 +65,7 @@ class PhoneValidator:
                 raise ValidationError({
                     f'{where}': _("Number must be a valid phone number written in E164 format.")
                 })
-        except NumberParseException:
+        except phonenumbers.phonenumberutil.NumberParseException:
             raise ValidationError({
                 f'{where}': _('Number must be a valid phone number written in E164 format')
                 })
@@ -85,29 +83,4 @@ class PhoneValidator:
                 'end': _("End number must be greater than or equal to the start number.")
             })
 
-
-def number_quicksearch(start: int, end: int, pattern: str) -> bool:
-    '''
-    number quicksearch with pattern in range of start>>end
-    '''
-    pattern_len = len(pattern)
-    pattern_int = int(pattern)
-
-    # calculate the largest multiple of 10^len(pattern) <= start
-    base = start - (start % 10 ** pattern_len)
-
-    while base <= end:
-        # check if the base + pattern is in the range
-        if base + pattern_int >= start and base + pattern_int <= end:
-            return True
-
-        # move to the next block
-        base += 10 ** pattern_len 
-
-        # if the pattern search is impossible because base is too big
-        # break the loop and return false
-        if base > end - pattern_int:
-            break
-
-    return False
 

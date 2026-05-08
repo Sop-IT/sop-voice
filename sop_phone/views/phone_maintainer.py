@@ -1,12 +1,15 @@
-from dcim.models import Site
-from netbox.views import generic
+
 from utilities.views import GetRelatedModelsMixin, register_model_view
 
-from ..models import PhoneMaintainer, PhoneInfo, PhoneDID, PhoneDelivery
-from ..filtersets import PhoneMaintainerFilterSet
-from ..tables.phone_maintainer import *
-from ..forms.phone_maintainer import *
-from ..utils import count_all_did
+from netbox.views import generic
+
+from dcim.models import Site
+
+from sop_phone.models import PhoneMaintainer, PhoneInfo, PhoneDID
+from sop_phone.filtersets import PhoneMaintainerFilterSet
+from sop_phone.tables.phone_maintainer import PhoneMaintainerTable
+from sop_phone.forms.phone_maintainer import PhoneMaintainerForm, PhoneMaintainerFilterForm, PhoneMaintainerBulkEditForm, PhoneMaintainerBulkImportForm
+
 
 
 __all__ = (
@@ -27,23 +30,8 @@ class PhoneMaintainerListView(generic.ObjectListView):
     filterset_form = PhoneMaintainerFilterForm
 
 
-class PhoneMaintainerView(generic.ObjectView, GetRelatedModelsMixin):
+class PhoneMaintainerView(GetRelatedModelsMixin, generic.ObjectView):
     queryset = PhoneMaintainer.objects.all()
-
-    def count_did(self, sites) -> tuple[int, int]:
-        '''
-        num_did = count of all numbers
-        '''
-        num_did: int = 0
-
-        for instance in sites:
-            temp = count_all_did(
-                PhoneDID.objects.filter(delivery__site=instance.site),
-                PhoneDelivery.objects.filter(site=instance.site)
-            )
-            num_did += temp.__int__()
-
-        return num_did
 
     def get_format(self, values) -> str | None:
         qs = [str(item['site__id']) for item in values]
@@ -51,7 +39,7 @@ class PhoneMaintainerView(generic.ObjectView, GetRelatedModelsMixin):
             return None
         return f'id=' + '&id='.join(qs)
 
-    def get_extra_context(self, request, instance):
+    def get_extra_context(self, request, instance:PhoneMaintainer):
         '''
         additionnal context for the related models/objects
         as they are not directly related
@@ -61,7 +49,7 @@ class PhoneMaintainerView(generic.ObjectView, GetRelatedModelsMixin):
         sites = PhoneInfo.objects.filter(maintainer=instance)
         site_ids = sites.values('site__id')
 
-        context['num_did'] = self.count_did(sites)
+        context['num_did'] = instance.get_did_count()
         context['site_ids'] = site_ids
         context['related_models'] = self.get_related_models(
             request, 

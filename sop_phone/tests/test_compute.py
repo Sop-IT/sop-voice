@@ -3,8 +3,7 @@ from django.test import TestCase
 from dcim.models import Site
 from circuits.models import Provider
 
-from ..models import PhoneDID, PhoneDelivery, PhoneInfo, PhoneMaintainer
-from ..utils import count_all_did
+from sop_phone.models import PhoneDID, PhoneDelivery
 
 
 class CountDIDTestCase(TestCase):
@@ -31,15 +30,15 @@ class CountDIDTestCase(TestCase):
         cls.did3 = fast_create_did(cls.s1, 1140, None, 1150)
         cls.did4 = fast_create_did(cls.s1, 1151, None, 1161)
 
-    def test_count_all_did_basic(self):
+    def test_count_didrange_dids_basic(self):
         """Test count all DID compute function"""
-        r = count_all_did(PhoneDID.objects.filter(site=self.s1)).__int__()
+        r = PhoneDID.count_dids(PhoneDID.objects.filter(site=self.s1))
         self.assertTrue(r == 51)
 
-        r = count_all_did(PhoneDID.objects.filter(site=self.s2)).__int__()
+        r = PhoneDID.count_dids(PhoneDID.objects.filter(site=self.s2))
         self.assertTrue(r == 0)
 
-    def test_count_all_did_with_ndi(self):
+    def test_count_deliveries_dids_with_ndi(self):
         """Test count allDID compute function with PhoneDelivery NDI"""
         d = PhoneDelivery(
             site=self.s1,
@@ -56,6 +55,6 @@ class CountDIDTestCase(TestCase):
         self.did2.save()
         self.did3.save()
         self.did4.save()
-        r = count_all_did(PhoneDID.objects.filter(site=self.s1), PhoneDelivery.objects.filter(site=self.s1)).__int__()
+        r = PhoneDelivery.count_dids(PhoneDelivery.objects.filter(site=self.s1))
         self.assertTrue(r == 52)
 

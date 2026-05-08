@@ -2,14 +2,17 @@ import django_filters
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _ 
 
-from dcim.models import Site, Region, SiteGroup
-from netbox.filtersets import NetBoxModelFilterSet
 from utilities.filters import MultiValueCharFilter
+from utilities.filtersets import register_filterset
+
+from netbox.filtersets import NetBoxModelFilterSet
+
+from dcim.models import Site, Region, SiteGroup
+
 from tenancy.filtersets import  ContactModelFilterSet
 
-from .models import *
-from .validators import number_quicksearch
-
+from sop_phone.models import PhoneDeliveryStatusChoices, PhoneInfo, PhoneMaintainer, PhoneDelivery, PhoneDID, PhoneMaintainerStatusChoice
+from sop_phone.utils import number_quicksearch
 
 __all__ = (
     'PhoneDeliveryFilterSet',
@@ -21,7 +24,7 @@ __all__ = (
 
 #_________________________
 # Phone Delivery Filters
-
+@register_filterset
 class PhoneDeliveryFilterSet(NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=PhoneDeliveryStatusChoices,
@@ -49,11 +52,11 @@ class PhoneDeliveryFilterSet(NetBoxModelFilterSet):
     maintainer_id = django_filters.ModelMultipleChoiceFilter(
         queryset=PhoneMaintainer.objects.all(),
         method='search_maintainer_id',
-        label=_('Maintainer (ID)')
+        label=_('Maintainer ID')
     )
     maintainer_name = django_filters.CharFilter(
         method='search_maintainer_name',
-        label=_('Maintainer (name')
+        label=_('Maintainer Name')
     )
 
     class Meta:
@@ -66,7 +69,8 @@ class PhoneDeliveryFilterSet(NetBoxModelFilterSet):
         try:
             site_ids = PhoneInfo.objects.filter(maintainer__in=value).values_list('site__id', flat=True )
             return queryset.filter(site__id__in=site_ids)
-        except:return queryset
+        except:
+            return queryset
 
     def search_maintainer_name(self, queryset, name, value):
         if not value:
@@ -75,7 +79,8 @@ class PhoneDeliveryFilterSet(NetBoxModelFilterSet):
             maintainer_ids = PhoneMaintainer.objects.filter(name=value).values_list('id', flat=True)
             site_ids = PhoneInfo.objects.filter(maintainer__in=maintainer_ids).values_list('site__id', flat=True)
             return queryset.filter(site__id__in=site_ids)
-        except:return queryset
+        except:
+            return queryset
 
     def search(self, queryset, name, value):
         if not value.strip():
@@ -92,7 +97,7 @@ class PhoneDeliveryFilterSet(NetBoxModelFilterSet):
 
 #_________________________
 # Informations filters
-
+@register_filterset
 class PhoneInfoFilterSet(NetBoxModelFilterSet):
 
     site_id = django_filters.ModelMultipleChoiceFilter(
@@ -145,7 +150,7 @@ class PhoneInfoFilterSet(NetBoxModelFilterSet):
 
 #_________________________
 # Maintainers filter
-
+@register_filterset
 class PhoneMaintainerFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=PhoneMaintainerStatusChoice,
@@ -225,7 +230,7 @@ class PhoneMaintainerFilterSet(NetBoxModelFilterSet, ContactModelFilterSet):
 
 #_________________________
 # DID filters (DIDs)
-
+@register_filterset
 class PhoneDIDFilterSet(NetBoxModelFilterSet):
     site_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Site.objects.all(),
@@ -265,21 +270,31 @@ class PhoneDIDFilterSet(NetBoxModelFilterSet):
         field_name='site__group',
         label=_('Site group')
     )
+    range_size = django_filters.NumberFilter(
+        method='search_range_size',
+        label=_('Minimum DID range size')
+    )
 
     class Meta:
         model = PhoneDID
         fields = ('id', 'start', 'end', 'site', 'delivery_id')
 
+    def search_range_size(self, queryset, name, value):
+        if not value:
+            return queryset
+        valid_ids: list[int] = []
+        for rng in queryset:
+            if rng.end-rng.start>=value:
+                valid_ids.append(rng.id)
+        return queryset.filter(id__in=valid_ids)
+    
     def search_partial_number(self, queryset, name, value):
         if not value:
             return queryset
-
         valid_ids: list[int] = []
-
         for rng in queryset:
             if number_quicksearch(rng.start, rng.end, str(value)):
                 valid_ids.append(rng.id)
-
         return queryset.filter(id__in=valid_ids)
 
     def did_maintainer_name_filter(self, queryset, name, value):

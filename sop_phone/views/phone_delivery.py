@@ -1,18 +1,17 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.utils.translation import gettext_lazy as _
 from django.shortcuts import get_object_or_404
 
-from utilities.views import GetRelatedModelsMixin, register_model_view
+from utilities.permissions import get_permission_for_model
+from utilities.views import GetRelatedModelsMixin
 
 from netbox.views import generic
 from dcim.models import Site
 
-from ..forms.phone_delivery import *
-from ..tables.phone_delivery import *
-from ..tables.phone_did import *
-from ..filtersets import PhoneDeliveryFilterSet
-from ..models import *
-from ..utils import count_all_did, format_number
+from sop_phone.forms.phone_delivery import PhoneDeliveryForm, PhoneDeliveryFilterForm, PhoneDeliveryBulkEditForm
+from sop_phone.tables.phone_delivery import PhoneDeliveryTable
+from sop_phone.filtersets import PhoneDeliveryFilterSet
+from sop_phone.models import PhoneDelivery, PhoneDID, PhoneInfo
+from sop_phone.utils import format_number_flag
 
 
 __all__ =  (
@@ -46,28 +45,29 @@ class PhoneDeliveryBulkDeleteView(generic.BulkDeleteView):
     filterset = PhoneDeliveryFilterSet
 
 
-class PhoneDeliveryDetailView(generic.ObjectView, PermissionRequiredMixin, GetRelatedModelsMixin):
+class PhoneDeliveryDetailView(GetRelatedModelsMixin, PermissionRequiredMixin, generic.ObjectView):
     '''
     returns the Phone Delivery detail page with context
     '''
     queryset = PhoneDelivery.objects.all()
+    permission_required=get_permission_for_model(PhoneDelivery, "view")
 
     def get_extra_context(self, request, instance) -> dict:
         context: dict = {}
 
-        did = PhoneDID.objects.filter(delivery=instance)
+        dids = PhoneDID.objects.filter(delivery=instance)
 
         try:
             site_info = PhoneInfo.objects.filter(site=instance.site.id)
             context['maintainer'] = site_info.first().maintainer
         except:pass
         if instance.ndi:
-            context['ndi'] = format_number(instance.ndi)
+            context['ndi'] = format_number_flag(instance.ndi)
         if instance.dto:
-            context['dto'] = format_number(instance.dto)
+            context['dto'] = format_number_flag(instance.dto)
         context['did_range'] = PhoneDID
-        context['num_range'] = did.count()
-        context['num_did'] = count_all_did(did).__int__()
+        context['num_range'] = dids.count()
+        context['num_did'] = PhoneDelivery.count_dids(dids)
         context['related_models'] = self.get_related_models(
             request, instance,
         )
@@ -82,11 +82,12 @@ class PhoneDeliveryEditView(generic.ObjectEditView):
     form = PhoneDeliveryForm
 
 
-class PhoneDeliveryDeleteView(generic.ObjectDeleteView, PermissionRequiredMixin):
+class PhoneDeliveryDeleteView(PermissionRequiredMixin, generic.ObjectDeleteView ):
     '''
     deletes a Phone Delivery object
     '''
     queryset = PhoneDelivery.objects.all()
+    permission_required=get_permission_for_model(PhoneDelivery, "delete")
 
 
 class PhoneDeliverySiteView(generic.ObjectEditView):

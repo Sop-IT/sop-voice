@@ -1,13 +1,12 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelForm, NetBoxModelImportForm
-from utilities.forms.fields import DynamicModelChoiceField, DynamicModelChoiceField, CSVModelChoiceField
+from utilities.forms.fields import DynamicModelChoiceField, CSVModelChoiceField
 from utilities.forms.rendering import FieldSet
 from dcim.models import Site, Region, SiteGroup
 
-from ..models import *
+from sop_phone.models import PhoneDID, PhoneDelivery, PhoneMaintainer
 
 
 __all__ = (
@@ -89,7 +88,11 @@ class PhoneDIDFilterForm(NetBoxModelFilterSetForm):
         required=False,
         help_text=_('E164 format')
     )
-
+    range_size = forms.IntegerField(
+        label=_('DID range size'),
+        required=False,
+        help_text=_('Minimum DID range size')
+    )
     fieldsets = (
         FieldSet(
             'region_id', 'group_id', 'site_id',
@@ -100,7 +103,7 @@ class PhoneDIDFilterForm(NetBoxModelFilterSetForm):
             name=_('Information')
         ),
         FieldSet(
-            'partial_number', 'start', 'end',
+            'partial_number', 'start', 'end', 'range_size',
             name=_('Attributes')
         )
     )

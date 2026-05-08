@@ -3,8 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 from netbox.tables import NetBoxTable, ChoiceFieldColumn
 
-from ..models import PhoneDelivery
-from ..utils import format_number
+from sop_phone.models import PhoneDelivery
+from sop_phone.utils import format_number_flag
 
 
 __all__ = (
@@ -48,7 +48,7 @@ class PhoneDeliveryTable(NetBoxTable):
         default_columns = ('actions', 'site', 'delivery', 'channel_count', 'status', 'ndi', 'dto', 'description')
 
     def render_ndi(self, record):
-        return format_number(record.ndi)
+        return format_number_flag(record.ndi)
 
     def render_dto(self, record):
-        return format_number(record.dto)
+        return format_number_flag(record.dto)

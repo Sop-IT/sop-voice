@@ -33,7 +33,7 @@ This tool enables efficient `pattern matching` across large datasets of number r
 
 - **Pattern matching in number ranges**: Quickly find ranges that include numbers matching a given pattern.
 - **Virtual range emulation**: The algorithm effectively emulates the data within the number ranges without needing to store every individual number.
-- **High performance**: Optimized to perform rapid searches, even o, extensive datasets.
+- **High performance**: Optimized to perform rapid searches, even on extensive datasets.
 
 ---
 
@@ -45,4 +45,8 @@ The algorithm performs a search across number ranges to find matches based on a 
 +33344556778 to +33344556880
 ```
 
-If the search pattern is `6789`, the filter will return the range because `` falls between +3334455**6778** to +3334455**6880**
+If the search pattern is `6789`, the filter will return the range because it exists between +3334455**6778** and +3334455**6880**
+
+If the search pattern is `333`, the filter will return the range because it exists between +49266787**331**50 and +49266787**340**52
+
+
