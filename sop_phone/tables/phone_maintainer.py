@@ -4,14 +4,14 @@ from django.utils.translation import gettext_lazy as _
 from netbox.tables import NetBoxTable, ChoiceFieldColumn, columns
 from tenancy.tables import ContactsColumnMixin
 
-from ..models import PhoneMaintainer
+from sop_phone.models import PhoneMaintainer
 
 
 __all__ = (
     'PhoneMaintainerTable',
 )
 
-class PhoneMaintainerTable(NetBoxTable, ContactsColumnMixin):
+class PhoneMaintainerTable(ContactsColumnMixin, NetBoxTable):
     '''
     table for all Phone Deliveries
     '''
