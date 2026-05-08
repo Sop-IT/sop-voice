@@ -1,16 +1,16 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.utils.translation import gettext_lazy as _
-from django.urls import reverse
 from django.shortcuts import get_object_or_404
+
+from utilities.permissions import get_permission_for_model
 
 from netbox.views import generic
 from dcim.models import Site
 
-from ..forms.phone_did import *
-from ..tables.phone_did import *
-from ..filtersets import PhoneDIDFilterSet
-from ..models import *
-from ..utils import count_all_did, format_number
+from sop_phone.forms.phone_did import PhoneDIDForm, PhoneDIDFilterForm, PhoneDIDBulkEditForm, PhoneDIDBulkImportForm
+from sop_phone.tables.phone_did import PhoneDIDTable
+from sop_phone.filtersets import PhoneDIDFilterSet
+from sop_phone.models import PhoneDID, PhoneInfo
+from sop_phone.utils import format_number_flag
 
 
 __all__ = (
@@ -69,18 +69,20 @@ class PhoneDIDDeleteView(generic.ObjectDeleteView):
     queryset = PhoneDID.objects.all()
 
 
-class PhoneDIDDetailView(generic.ObjectView, PermissionRequiredMixin):
+class PhoneDIDDetailView(PermissionRequiredMixin, generic.ObjectView):
     '''
     returns the DID detail page with context
     '''
+    
     queryset = PhoneDID.objects.all()
+    permission_required=get_permission_for_model(PhoneDID, "view")
 
     def get_extra_context(self, request, instance):
         context: dict = {}
 
-        context['start'] = format_number(instance.start)
-        context['end'] = format_number(instance.end)
-        context['num_did'] = count_all_did(instance).__int__()
+        context['start'] = format_number_flag(instance.start)
+        context['end'] = format_number_flag(instance.end)
+        context['num_did'] = instance.get_did_count()
         try:
             context['maintainer'] = PhoneInfo.objects.filter(site=instance.delivery.site).first()
         except:

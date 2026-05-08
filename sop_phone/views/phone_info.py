@@ -1,14 +1,12 @@
-from django.utils.translation import gettext_lazy as _
 from django.shortcuts import get_object_or_404
 
 from netbox.views import generic
 from dcim.models import Site
 
-from ..utils import count_all_did
-from ..forms.phone_info import *
-from ..models import PhoneInfo, PhoneDID
-from ..filtersets import PhoneInfoFilterSet
-from ..tables.phone_info import PhoneInfoTable
+from sop_phone.forms.phone_info import PhoneInfoForm, PhoneInfoFilterForm, PhoneInfoBulkEditForm
+from sop_phone.models import PhoneInfo, PhoneMaintainer
+from sop_phone.filtersets import PhoneInfoFilterSet
+from sop_phone.tables.phone_info import PhoneInfoTable
 
 
 __all__ = (
@@ -63,11 +61,10 @@ class PhoneInfoListView(generic.ObjectListView):
 class PhoneInfoDetailView(generic.ObjectView):
     queryset = PhoneInfo.objects.all()
     
-    def get_extra_context(self, request, instance) -> dict:
+    def get_extra_context(self, request, instance:PhoneInfo) -> dict:
         context:dict = {}
-        
-        dids = PhoneDID.objects.filter(site=get_object_or_404(Site, pk=instance.site.id))
-        context['num_did'] = count_all_did(dids).__int__()
+        context['num_del'] = instance.get_del_count()
+        context['num_did'] = instance.get_did_count()
         return context
 
 
