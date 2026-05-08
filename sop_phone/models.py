@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
 from django.db.models import Transform
+from django.db.models.query import QuerySet
+
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -12,21 +14,16 @@ from utilities.choices import ChoiceSet
 from circuits.models import Provider
 from dcim.models import Site
 
-from .validators import PhoneValidator, PhoneMaintainerValidator
-from .utils import format_number, format_number_error
+from sop_phone.validators import PhoneValidator, PhoneMaintainerValidator
+from sop_phone.utils import format_number_flag, format_number_error
+
 
 
 __all__ = (
     'PhoneDID',
-    'LogValue',
     'PhoneInfo',
-    'FloorValue',
     'PhoneDelivery',
-    'AbsoluteValue',
     'PhoneMaintainer',
-    'PhoneBoolChoices',
-    'PhoneMaintainerStatusChoice',
-    'PhoneDeliveryStatusChoices',
 )
 
 
@@ -168,7 +165,21 @@ class PhoneMaintainer(ContactsMixin, NetBoxModel):
 
     def get_status_color(self) -> str:
         return PhoneDeliveryStatusChoices.colors.get(self.status)
-
+    
+    def get_did_count(self) -> int:
+        cnt:int=0
+        pi:PhoneInfo
+        for pi in self.phoneinfo_set.all():
+            cnt+=pi.get_did_count()
+        return cnt
+    
+    def get_del_count(self) -> int:
+        cnt:int=0
+        pi:PhoneInfo
+        for pi in self.phoneinfo_set.all():
+            cnt+=pi.get_del_count()
+        return cnt
+               
     class Meta(NetBoxModel.Meta):
         verbose_name = _('Phone Maintainer')
         verbose_name_plural = _('Phone Maintainers')
@@ -212,7 +223,20 @@ class PhoneInfo(NetBoxModel):
 
     def get_absolute_url(self) -> str:
         return reverse('plugins:sop_phone:phoneinfo_detail', args=[self.pk])
-
+    
+    def get_did_count(self) -> int:
+        cnt:int=0
+        d:PhoneDelivery
+        for d in self.get_deliveries():
+            cnt+=d.get_did_count()
+        return cnt
+       
+    def get_del_count(self) -> int:
+        return self.get_deliveries().count()
+    
+    def get_deliveries(self) -> QuerySet:
+        return self.site.phonedelivery_set.all()
+     
     class Meta(NetBoxModel.Meta):
         verbose_name = _('Information')
         verbose_name_plural = _('Informations')
@@ -278,7 +302,19 @@ class PhoneDelivery(NetBoxModel):
 
     def get_status_color(self) -> str:
         return PhoneDeliveryStatusChoices.colors.get(self.status)
-
+    
+    def get_did_count(self) -> int:
+        cnt:int=0
+        overlap:bool=False
+        did:PhoneDID
+        for did in self.phonedid_set.all():
+            cnt+=did.get_did_count()
+            if self.ndi and did.contains(self.ndi):
+                overlap=True
+        if self.ndi and not overlap:
+            cnt=cnt+1
+        return cnt
+    
     def __str__(self) -> str:
         delivery:str|None = self.delivery if hasattr(self, 'delivery') else 'Unknown delivery'
         provider:str = self.provider if hasattr(self, 'provider') else 'Unknown provider'
@@ -343,6 +379,14 @@ class PhoneDelivery(NetBoxModel):
             )
         )
 
+    @staticmethod
+    def count_dids(deliveries:QuerySet)->int:
+        cnt:int=0
+        d:PhoneDelivery
+        for d in deliveries:
+            cnt+=d.get_did_count()
+        return cnt
+
 
 class PhoneDID(NetBoxModel):
     delivery = models.ForeignKey(
@@ -376,10 +420,28 @@ class PhoneDID(NetBoxModel):
         if not self.start and not self.end:
             return f'No DID'
         # \u00A0 is unicode for ' '
-        return f'{format_number(number=self.start)}\u00A0\u00A0\u00A0\u00A0>>\u00A0\u00A0\u00A0\u00A0{format_number(number=self.end)}'
+        return f'{format_number_flag(number=self.start)}\u00A0\u00A0\u00A0\u00A0>>\u00A0\u00A0\u00A0\u00A0{format_number_flag(number=self.end)}'
 
     def get_absolute_url(self) -> str:
         return reverse('plugins:sop_phone:phonedid_detail', args=[self.pk])
+
+    def get_did_count(self) -> int:
+        start=self.start
+        if start is None:
+            return 0
+        end=self.end or start
+        if start > end:
+            return 0
+        return (end - start) + 1
+
+    def contains(self, number:int) -> bool:
+        start=self.start
+        if start is None:
+            return False
+        end=self.end or start
+        if start > end:
+            return False
+        return (number>=start and number<=end)
 
     def clean(self):
         super().clean()
@@ -457,3 +519,11 @@ class PhoneDID(NetBoxModel):
                 violation_error_message=_("End number must be greater than or equal to start number.")
             )
         )
+
+    @staticmethod
+    def count_dids(dids:QuerySet)->int:
+        cnt:int=0
+        d:PhoneDID
+        for d in dids:
+            cnt+=d.get_did_count()
+        return cnt
