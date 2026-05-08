@@ -34,34 +34,44 @@
 {% block content %}
 <div class="row">
   <div class="col col-md-6">
-    <div class="card">
+	
+	<div class="card">
+	  <h5 class="card-header">{{object|meta:"verbose_name"|bettertitle}}</h5>
+	  <table class="table table-hover attr-table">
+		  <tr>
+	      <th scope="row">{% trans "Deliveries" %}</th>
+        <td>
+          {{num_del}}
+        </td>
+	    </tr>
+	  <tr>
+	  <th scope="row">{% trans "Phone numbers" %}</th>
+	<td>
+	  {{num_did}}
+	</td>
+	</tr>
+	  </table>
+	</div>
+   
+	<div class="card">
+    <h5 class="card-header">{{object.maintainer|meta:"verbose_name"|bettertitle}}</h5>
+    <table class="table table-hover attr-table">
+      <tr>
+        <th scope="row">{% trans "Maintainer" %}</th>
+        <td>
+          {{object.maintainer|linkify}}
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">{% trans "Maintainer status" %}</th>
+        <td>
+          {% badge object.maintainer.get_status_display bg_color=object.maintainer.get_status_color %}
+        </td>
+      </tr>
+	  </table>
+	</div>
+		   
 
-      <h5 class="card-header">{{object|meta:"verbose_name"|bettertitle}}</h5>
-      <table class="table table-hover attr-table">
-
-        <tr>
-          <th scope="row">{% trans "Maintainer" %}</th>
-          <td>
-            {{object.maintainer|linkify}}
-          </td>
-        </tr>
-
-        <tr>
-          <th scope="row">{% trans "Maintainer status" %}</th>
-          <td>
-            {% badge object.maintainer.get_status_display bg_color=object.maintainer.get_status_color %}
-          </td>
-        </tr>
-
-        <tr>
-          <th scope="row">{% trans "Phone numbers maintained" %}</th>
-            <td>
-              {{num_did}} number(s)
-            </td>
-        </tr>
-
-      </table>
-    </div>
   </div>
 
   <div class="col-md-6">
