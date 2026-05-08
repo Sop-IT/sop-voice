@@ -11,3 +11,7 @@ dist/
 venv/
 launch.json
 .vscode/
+.idea/
+.settings/
+.pydevproject
+.project
