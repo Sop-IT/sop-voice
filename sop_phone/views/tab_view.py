@@ -1,18 +1,15 @@
 from django.shortcuts import render, get_object_or_404
-from django.utils.translation import gettext_lazy as _
-from django.shortcuts import redirect
 from django.views import View
 
 from utilities.views import register_model_view, ViewTab, ContentTypePermissionRequiredMixin
-from utilities.permissions import get_permission_for_model
+
 from netbox.views.generic.mixins import ActionsMixin
 from netbox.constants import DEFAULT_ACTION_PERMISSIONS
 from dcim.models import Site
 
-from ..tables.phone_delivery import *
-from ..tables.phone_did import *
-from ..models import *
-from ..utils import count_all_did
+from sop_phone.tables.phone_delivery import PhoneDeliveryTable
+from sop_phone.tables.phone_did import PhoneDIDTable
+from sop_phone.models import PhoneDID, PhoneDelivery, PhoneInfo
 
 
 '''
@@ -32,10 +29,7 @@ class PhoneSiteTabView(View, ContentTypePermissionRequiredMixin, ActionsMixin):
     '''
     tab = ViewTab(
         label="Phone",
-        badge=lambda obj: count_all_did(
-            PhoneDID.objects.filter(site=obj),
-            PhoneDelivery.objects.filter(site=obj)
-        ).__int__()
+        badge=lambda obj: PhoneDID.count_dids(PhoneDelivery.objects.filter(site=obj))
     )
     template_name = "sop_phone/tab/tab.html"
     actions= DEFAULT_ACTION_PERMISSIONS
