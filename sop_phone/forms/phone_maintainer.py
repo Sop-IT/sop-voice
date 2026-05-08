@@ -16,7 +16,7 @@ from netbox.forms import (
 )
 from dcim.models import Site, Region, SiteGroup
 
-from ..models import *
+from sop_phone.models import PhoneMaintainer, PhoneMaintainerStatusChoice
 
 
 __all__ = (

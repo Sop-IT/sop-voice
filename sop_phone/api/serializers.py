@@ -1,5 +1,5 @@
 from django.db.models import Prefetch
-from django.utils.translation import gettext_lazy as _
+
 from rest_framework import serializers
 
 from timezone_field.rest_framework import TimeZoneSerializerField
@@ -10,7 +10,7 @@ from dcim.api.serializers import SiteSerializer
 from circuits.api.serializers import ProviderSerializer
 from dcim.models import Site
 
-from ..models import *
+from sop_phone.models import PhoneDelivery, PhoneDID, PhoneInfo, PhoneMaintainer, PhoneMaintainerStatusChoice
 
 
 __all__ = (

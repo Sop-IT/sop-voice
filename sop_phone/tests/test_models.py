@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from dcim.models import Site
 from circuits.models import Provider
 
-from ..models import PhoneDelivery, PhoneDID, PhoneMaintainer, PhoneInfo
+from sop_phone.models import PhoneDelivery, PhoneDID, PhoneMaintainer, PhoneInfo
 
 
 class PhoneInfoTestCase(TestCase):
@@ -40,6 +40,7 @@ class PhoneInfoTestCase(TestCase):
             site=self.site,
             maintainer=self.maintainer
         )
+        info.full_clean()
 
         with transaction.atomic():
             with self.assertRaises(IntegrityError):
@@ -47,6 +48,7 @@ class PhoneInfoTestCase(TestCase):
                     site=self.site,
                     maintainer=self.maintainer
                 )
+                info.full_clean()
 
 
 class PhoneMaintainerTestCase(TestCase):
@@ -70,6 +72,7 @@ class PhoneMaintainerTestCase(TestCase):
                     slug="dauphin_telelom",
                     status="retired"
                 )
+                mt.full_clean()
 
     def test_unique_maintainer_slug(self):
         """Test that non-unique slug raises IntegrityError"""
@@ -80,6 +83,7 @@ class PhoneMaintainerTestCase(TestCase):
                     slug="dauphin_telecom",
                     status="active",
                 )
+                mt.full_clean()
 
     def test_address_validator(self):
         """Test that bad-format address raises ValidationError"""

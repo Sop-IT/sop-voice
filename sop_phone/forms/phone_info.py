@@ -6,7 +6,7 @@ from utilities.forms.fields import DynamicModelChoiceField
 from utilities.forms.rendering import FieldSet
 from dcim.models import Site, Region, SiteGroup
 
-from ..models import PhoneInfo, PhoneMaintainer
+from sop_phone.models import PhoneInfo, PhoneMaintainer
 
 
 __all__ = (

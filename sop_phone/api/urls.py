@@ -1,6 +1,6 @@
 from netbox.api.routers import NetBoxRouter
 
-from .views import *
+from sop_phone.api.views import PhoneDeliveryViewSet, PhoneDIDViewSet, PhoneInfoViewSet, PhoneMaintainerViewSet
 
 
 router = NetBoxRouter()

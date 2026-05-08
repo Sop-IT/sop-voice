@@ -1,6 +1,6 @@
 from netbox.search import SearchIndex, register_search
 
-from .models import *
+from sop_phone.models import PhoneDID, PhoneDelivery, PhoneMaintainer
 
 
 @register_search

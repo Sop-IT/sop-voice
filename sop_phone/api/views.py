@@ -1,9 +1,9 @@
 from netbox.api.viewsets import NetBoxModelViewSet
 from netbox.api.metadata import ContentTypeMetadata
 
-from ..models import *
-from ..filtersets import *
-from .serializers import *
+from sop_phone.models import PhoneDelivery, PhoneDID, PhoneInfo, PhoneMaintainer
+from sop_phone.filtersets import PhoneDeliveryFilterSet, PhoneDIDFilterSet, PhoneInfoFilterSet, PhoneMaintainerFilterSet
+from sop_phone.api.serializers import PhoneDeliverySerializer, PhoneDIDSerializer, PhoneInfoSerializer, PhoneMaintainerSerializer 
 
 
 __all__ = (

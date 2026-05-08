@@ -3,13 +3,12 @@ from django.utils.translation import gettext_lazy as _
 
 from circuits.models import Provider
 from utilities.forms import add_blank_choice
-from utilities.forms.fields import SlugField
 from dcim.models import Site, Region, SiteGroup
 from utilities.forms.fields import DynamicModelChoiceField, CommentField
 from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm, NetBoxModelBulkEditForm
 from utilities.forms.rendering import FieldSet
 
-from ..models import *
+from sop_phone.models import PhoneDelivery, PhoneMaintainer, PhoneDeliveryStatusChoices
 
 
 __all__ = (

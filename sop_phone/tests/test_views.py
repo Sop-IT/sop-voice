@@ -4,7 +4,7 @@ from utilities.testing import TestCase
 from circuits.models import Provider
 from dcim.models import Site
 
-from sop_phone.models import *
+from sop_phone.models import PhoneDelivery, PhoneDID, PhoneMaintainer
 
 
 class SopPhoneViewTestCaseMixin:
