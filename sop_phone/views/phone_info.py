@@ -4,7 +4,7 @@ from netbox.views import generic
 from dcim.models import Site
 
 from sop_phone.forms.phone_info import PhoneInfoForm, PhoneInfoFilterForm, PhoneInfoBulkEditForm
-from sop_phone.models import PhoneInfo, PhoneMaintainer
+from sop_phone.models import PhoneInfo
 from sop_phone.filtersets import PhoneInfoFilterSet
 from sop_phone.tables.phone_info import PhoneInfoTable
 
