@@ -9,7 +9,7 @@ class SopPhoneConfig(PluginConfig):
     author = "Soprema NOC team"
     author_email = "noc@soprema.com"
     base_url = "sop-phone"
-    min_version = "4.5.10"
+    min_version = "4.5.8"
 
 config = SopPhoneConfig
 
