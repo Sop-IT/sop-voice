@@ -8,7 +8,7 @@ from utilities.filtersets import register_filterset
 from netbox.filtersets import NetBoxModelFilterSet
 
 from dcim.models import Site, Region, SiteGroup
-
+from circuits.models import Provider
 from tenancy.filtersets import  ContactModelFilterSet
 
 from sop_phone.models import PhoneDeliveryStatusChoices, PhoneInfo, PhoneMaintainer, PhoneDelivery, PhoneDID, PhoneMaintainerStatusChoice
@@ -57,6 +57,11 @@ class PhoneDeliveryFilterSet(NetBoxModelFilterSet):
     maintainer_name = django_filters.CharFilter(
         method='search_maintainer_name',
         label=_('Maintainer Name')
+    )
+    provider_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Provider.objects.all(),
+        field_name='provider',
+        label=_('Maintainer ID')
     )
 
     class Meta:
