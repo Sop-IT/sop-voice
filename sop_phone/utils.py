@@ -1,5 +1,4 @@
 import phonenumbers
-import math
 
 __all__ = (
     'country_code_to_flag',
@@ -58,14 +57,13 @@ def number_quicksearch(first_num: int, last_num: int, lookup_str: str) -> bool:
     # Equal start and end numbers but no text match means no match
     if first_num==last_num:
         return False
-    # If the log10 of the difference between start adn end is greater than the number of digits in our lookup we are guaranteed to match
-    lg=math.log10(last_num-first_num)
+    # If the difference between start and end is gte than 10 ^(the number of digits in our lookup) we are guaranteed to match
     ls=len(lookup_str)
-    if lg > ls:
-        #print(f"match log {first_num=} {last_num=} {lg=} {lookup_str=} {ls=}")
+    incr = 10 ** ls
+    if (last_num-first_num+1) >= incr:
+        #print(f"match log {first_num=} {last_num=} {incr=} {lookup_str=} {ls=}")
         return True
     # No luck, we need to loop !
-    incr = 10 ** ls
     c = int(lookup_str) 
     #rounds=0
     while last_num>=c:
