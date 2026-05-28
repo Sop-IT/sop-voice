@@ -122,7 +122,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='phonedid',
-            constraint=models.CheckConstraint(check=models.Q(('end__gte', models.F('start')), ('start__biabs__bilog__bifloor', models.F('end'))), name='sop_phone_phonedid_end_greater_than_start', violation_error_message='End number must be greater than or equal to start number.'),
+            constraint=models.CheckConstraint(condition=models.Q(('end__gte', models.F('start')), ('start__biabs__bilog__bifloor', models.F('end'))), name='sop_phone_phonedid_end_greater_than_start', violation_error_message='End number must be greater than or equal to start number.'),
         ),
         migrations.AddConstraint(
             model_name='phonemaintainer',

@@ -513,7 +513,7 @@ class PhoneDID(NetBoxModel):
                 violation_error_message=_("End number must be unique.")
             ),
             models.CheckConstraint(
-                check=models.Q(end__gte=models.F('start')) & \
+                condition=models.Q(end__gte=models.F('start')) & \
                     models.Q(start__biabs__bilog__bifloor=models.F("end")),
                 name='%(app_label)s_%(class)s_end_greater_than_start',
                 violation_error_message=_("End number must be greater than or equal to start number.")
